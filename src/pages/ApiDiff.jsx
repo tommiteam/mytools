@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+import {useEffect, useMemo, useState, useCallback} from "react";
 import "../ApiDiff.css";
-import { API_DIF_URL } from "../utils/config";
+import {API_DIF_URL} from "../utils/config";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 const API_BASE = API_DIF_URL;
@@ -11,16 +11,16 @@ const LS_KEY = "apidiff.presets.v1";
  * --------------------------*/
 function kvToObj(kvs) {
     const out = {};
-    for (const { k, v } of kvs) {
+    for (const {k, v} of kvs) {
         if (k?.trim()) out[k.trim()] = v ?? "";
     }
     return out;
 }
 
 function objToKv(obj) {
-    if (!obj) return [{ k: "", v: "" }];
+    if (!obj) return [{k: "", v: ""}];
     const entries = Object.entries(obj);
-    return entries.length ? entries.map(([k, v]) => ({ k, v: String(v) })) : [{ k: "", v: "" }];
+    return entries.length ? entries.map(([k, v]) => ({k, v: String(v)})) : [{k: "", v: ""}];
 }
 
 function safeParseJSON(str) {
@@ -46,7 +46,7 @@ function saveUserPresets(presets) {
 /** ---------------------------
  * UI components
  * --------------------------*/
-function SectionHeader({ title, right }) {
+function SectionHeader({title, right}) {
     return (
         <div className="secHead">
             <div className="secHead__title">{title}</div>
@@ -55,7 +55,7 @@ function SectionHeader({ title, right }) {
     );
 }
 
-function KvEditor({ label, kvs, setKvs, hint }) {
+function KvEditor({label, kvs, setKvs, hint}) {
     return (
         <div className="kv">
             <div className="kv__head">
@@ -63,7 +63,7 @@ function KvEditor({ label, kvs, setKvs, hint }) {
                     <div className="kv__title">{label}</div>
                     {hint ? <div className="kv__hint">{hint}</div> : null}
                 </div>
-                <button className="btn btn--sm" onClick={() => setKvs((prev) => [...prev, { k: "", v: "" }])}>
+                <button className="btn btn--sm" onClick={() => setKvs((prev) => [...prev, {k: "", v: ""}])}>
                     + Add
                 </button>
             </div>
@@ -79,7 +79,7 @@ function KvEditor({ label, kvs, setKvs, hint }) {
                                 const val = e.target.value;
                                 setKvs((prev) => {
                                     const next = [...prev];
-                                    next[idx] = { ...next[idx], k: val };
+                                    next[idx] = {...next[idx], k: val};
                                     return next;
                                 });
                             }}
@@ -92,7 +92,7 @@ function KvEditor({ label, kvs, setKvs, hint }) {
                                 const val = e.target.value;
                                 setKvs((prev) => {
                                     const next = [...prev];
-                                    next[idx] = { ...next[idx], v: val };
+                                    next[idx] = {...next[idx], v: val};
                                     return next;
                                 });
                             }}
@@ -112,7 +112,14 @@ function KvEditor({ label, kvs, setKvs, hint }) {
     );
 }
 
-function ApiForm({ title, api, setApi }) {
+function isReportOk(rep) {
+    const s = rep?.summary || {};
+    return (s.fieldDiffs ?? 0) === 0 &&
+        (s.missingInOther ?? 0) === 0 &&
+        (s.missingInPrimary ?? 0) === 0;
+}
+
+function ApiForm({title, api, setApi}) {
     // local kv editors
     const [headers, setHeaders] = useState(() => objToKv(api.headers));
     const [queryOverrides, setQueryOverrides] = useState(() => objToKv(api.query));
@@ -128,23 +135,23 @@ function ApiForm({ title, api, setApi }) {
 
     // push local KV changes into api object (IMPORTANT)
     useEffect(() => {
-        setApi((prev) => ({ ...prev, headers: kvToObj(headers) }));
+        setApi((prev) => ({...prev, headers: kvToObj(headers)}));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [headers]);
 
     useEffect(() => {
-        setApi((prev) => ({ ...prev, query: kvToObj(queryOverrides) }));
+        setApi((prev) => ({...prev, query: kvToObj(queryOverrides)}));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [queryOverrides]);
 
     useEffect(() => {
-        setApi((prev) => ({ ...prev, queryKeyMap: kvToObj(queryKeyMap) }));
+        setApi((prev) => ({...prev, queryKeyMap: kvToObj(queryKeyMap)}));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [queryKeyMap]);
 
     return (
         <div className="card">
-            <SectionHeader title={title} />
+            <SectionHeader title={title}/>
 
             <div className="grid-2">
                 <div className="field">
@@ -152,7 +159,7 @@ function ApiForm({ title, api, setApi }) {
                     <input
                         className="input"
                         value={api.name || ""}
-                        onChange={(e) => setApi((prev) => ({ ...prev, name: e.target.value }))}
+                        onChange={(e) => setApi((prev) => ({...prev, name: e.target.value}))}
                     />
                 </div>
 
@@ -161,7 +168,7 @@ function ApiForm({ title, api, setApi }) {
                     <select
                         className="select"
                         value={api.method || "GET"}
-                        onChange={(e) => setApi((prev) => ({ ...prev, method: e.target.value }))}
+                        onChange={(e) => setApi((prev) => ({...prev, method: e.target.value}))}
                     >
                         {METHODS.map((m) => (
                             <option key={m} value={m}>
@@ -171,33 +178,34 @@ function ApiForm({ title, api, setApi }) {
                     </select>
                 </div>
 
-                <div className="field" style={{ gridColumn: "1 / span 2" }}>
+                <div className="field" style={{gridColumn: "1 / span 2"}}>
                     <label>URL</label>
                     <input
                         className="input"
                         value={api.url || ""}
-                        onChange={(e) => setApi((prev) => ({ ...prev, url: e.target.value }))}
+                        onChange={(e) => setApi((prev) => ({...prev, url: e.target.value}))}
                         placeholder="https://..."
                     />
                 </div>
 
-                <div className="field" style={{ gridColumn: "1 / span 2" }}>
+                <div className="field" style={{gridColumn: "1 / span 2"}}>
                     <label>Extract Path (empty = root array)</label>
                     <input
                         className="input"
                         value={api.extract || ""}
-                        onChange={(e) => setApi((prev) => ({ ...prev, extract: e.target.value }))}
+                        onChange={(e) => setApi((prev) => ({...prev, extract: e.target.value}))}
                         placeholder="e.g. data.items"
                     />
                 </div>
             </div>
 
-            <div className="grid-2" style={{ marginTop: 12 }}>
-                <KvEditor label="Headers (per-API overrides)" kvs={headers} setKvs={setHeaders} />
-                <KvEditor label="Query Overrides (per-API token/extra)" kvs={queryOverrides} setKvs={setQueryOverrides} />
+            <div className="grid-2" style={{marginTop: 12}}>
+                <KvEditor label="Headers (per-API overrides)" kvs={headers} setKvs={setHeaders}/>
+                <KvEditor label="Query Overrides (per-API token/extra)" kvs={queryOverrides}
+                          setKvs={setQueryOverrides}/>
             </div>
 
-            <div style={{ marginTop: 12 }}>
+            <div style={{marginTop: 12}}>
                 <KvEditor
                     label="Query Key Map (sharedKey → apiKey)"
                     hint="Example: shared key 'access_token' maps to API-specific key 'token'."
@@ -222,8 +230,8 @@ export default function ApiDiff() {
     const [maxDiffs, setMaxDiffs] = useState(5000);
     const [timeoutSec, setTimeoutSec] = useState(20);
 
-    const [sharedHeaders, setSharedHeaders] = useState([{ k: "accept", v: "application/json" }]);
-    const [sharedQuery, setSharedQuery] = useState([{ k: "", v: "" }]);
+    const [sharedHeaders, setSharedHeaders] = useState([{k: "accept", v: "application/json"}]);
+    const [sharedQuery, setSharedQuery] = useState([{k: "", v: ""}]);
 
     const [primary, setPrimary] = useState({
         name: "primary",
@@ -236,7 +244,7 @@ export default function ApiDiff() {
     });
 
     const [others, setOthers] = useState([
-        { name: "other-1", method: "GET", url: "", headers: {}, query: {}, queryKeyMap: {}, extract: "" }
+        {name: "other-1", method: "GET", url: "", headers: {}, query: {}, queryKeyMap: {}, extract: ""}
     ]);
 
     // ✅ IMPORTANT: provide a true React-style setState for each other row
@@ -264,7 +272,7 @@ export default function ApiDiff() {
     useEffect(() => {
         (async () => {
             try {
-                const res = await fetch("/presets.json", { cache: "no-store" });
+                const res = await fetch("/presets.json", {cache: "no-store"});
                 const data = await res.json();
                 if (Array.isArray(data)) setBuiltinPresets(data);
             } catch {
@@ -287,8 +295,8 @@ export default function ApiDiff() {
         setMaxDiffs(data.maxDiffs ?? 5000);
         setTimeoutSec(data.timeoutSec ?? 20);
 
-        setSharedHeaders(data.sharedHeaders ?? [{ k: "", v: "" }]);
-        setSharedQuery(data.sharedQuery ?? [{ k: "", v: "" }]);
+        setSharedHeaders(data.sharedHeaders ?? [{k: "", v: ""}]);
+        setSharedQuery(data.sharedQuery ?? [{k: "", v: ""}]);
 
         setPrimary(
             data.primary ?? {
@@ -340,7 +348,7 @@ export default function ApiDiff() {
         const name = (newPresetName || "").trim();
         if (!name) return alert("Enter a preset name.");
         const id = `user:${Date.now()}`;
-        const preset = { id, name, data: snapshotCurrentAsPreset() };
+        const preset = {id, name, data: snapshotCurrentAsPreset()};
         const next = [preset, ...userPresets];
         setUserPresets(next);
         saveUserPresets(next);
@@ -395,7 +403,7 @@ export default function ApiDiff() {
 
             const res = await fetch(`${API_BASE}/compare`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {"Content-Type": "application/json"},
                 body: JSON.stringify(payload)
             });
 
@@ -415,7 +423,8 @@ export default function ApiDiff() {
                 <div className="apidiff__header">
                     <div>
                         <h2 className="apidiff__title">API Diff</h2>
-                        <p className="apidiff__subtitle">Compare payloads across multiple APIs with shared headers/query mapping.</p>
+                        <p className="apidiff__subtitle">Compare payloads across multiple APIs with shared headers/query
+                            mapping.</p>
                     </div>
                     <span className="badge">
                         Base: <span className="code">{API_BASE}</span>
@@ -425,8 +434,8 @@ export default function ApiDiff() {
                 {/* Presets */}
                 <div className="card" style={{ marginBottom: 14 }}>
                     <SectionHeader title="Presets" right={<span className="badge">public + browser</span>} />
-                    <div className="grid-2" style={{ alignItems: "end" }}>
-                        <div className="field">
+                    <div className="presetsRow">
+                        <div className="field presetsRow__left">
                             <label>Preset</label>
                             <select
                                 className="select"
@@ -445,14 +454,15 @@ export default function ApiDiff() {
                                     ))
                                 )}
                             </select>
+
                             <div className="apidiff__subtitle" style={{ marginTop: 8 }}>
                                 Edit presets in <span className="code">public/presets.json</span>. User presets are stored in your browser.
                             </div>
                         </div>
 
-                        <div className="field">
+                        <div className="field presetsRow__right">
                             <label>Save current as preset</label>
-                            <div className="row">
+                            <div className="row row--nowrap row--tight">
                                 <input
                                     className="input"
                                     value={newPresetName}
@@ -462,7 +472,11 @@ export default function ApiDiff() {
                                 <button className="btn btn--primary" onClick={saveCurrentPreset}>
                                     Save
                                 </button>
-                                <button className="btn btn--danger" onClick={deleteSelectedPreset} disabled={!selectedPresetId.startsWith("user:")}>
+                                <button
+                                    className="btn btn--danger"
+                                    onClick={deleteSelectedPreset}
+                                    disabled={!selectedPresetId.startsWith("user:")}
+                                >
                                     Delete
                                 </button>
                             </div>
@@ -472,58 +486,63 @@ export default function ApiDiff() {
 
                 {/* Settings */}
                 <div className="card stack">
-                    <SectionHeader title="Settings" />
+                    <SectionHeader title="Settings"/>
                     <div className="grid-4">
                         <div className="field">
                             <label>Case name</label>
-                            <input className="input" value={reqName} onChange={(e) => setReqName(e.target.value)} />
+                            <input className="input" value={reqName} onChange={(e) => setReqName(e.target.value)}/>
                         </div>
                         <div className="field">
                             <label>ID key</label>
-                            <input className="input" value={idKey} onChange={(e) => setIdKey(e.target.value)} />
+                            <input className="input" value={idKey} onChange={(e) => setIdKey(e.target.value)}/>
                         </div>
                         <div className="field">
                             <label>Compare mode</label>
-                            <select className="select" value={compareMode} onChange={(e) => setCompareMode(e.target.value)}>
+                            <select className="select" value={compareMode}
+                                    onChange={(e) => setCompareMode(e.target.value)}>
                                 <option value="common">common</option>
                                 <option value="union">union</option>
                             </select>
                         </div>
                         <div className="field">
                             <label>Max diffs (0=unlimited)</label>
-                            <input className="input" type="number" value={maxDiffs} onChange={(e) => setMaxDiffs(e.target.value)} />
+                            <input className="input" type="number" value={maxDiffs}
+                                   onChange={(e) => setMaxDiffs(e.target.value)}/>
                         </div>
                     </div>
 
                     <div className="grid-2">
                         <div className="field">
                             <label>Ignore fields (comma)</label>
-                            <input className="input" value={ignoreFields} onChange={(e) => setIgnoreFields(e.target.value)} />
+                            <input className="input" value={ignoreFields}
+                                   onChange={(e) => setIgnoreFields(e.target.value)}/>
                         </div>
                         <div className="field">
                             <label>Compare fields (comma, optional)</label>
-                            <input className="input" value={compareFields} onChange={(e) => setCompareFields(e.target.value)} />
+                            <input className="input" value={compareFields}
+                                   onChange={(e) => setCompareFields(e.target.value)}/>
                         </div>
                     </div>
 
-                    <div className="field" style={{ maxWidth: 240 }}>
+                    <div className="field" style={{maxWidth: 240}}>
                         <label>Timeout (sec)</label>
-                        <input className="input" type="number" value={timeoutSec} onChange={(e) => setTimeoutSec(e.target.value)} />
+                        <input className="input" type="number" value={timeoutSec}
+                               onChange={(e) => setTimeoutSec(e.target.value)}/>
                     </div>
                 </div>
 
                 {/* Shared */}
-                <div style={{ marginTop: 14 }} className="grid-2">
-                    <KvEditor label="Shared Headers" kvs={sharedHeaders} setKvs={setSharedHeaders} />
-                    <KvEditor label="Shared Query params" kvs={sharedQuery} setKvs={setSharedQuery} />
+                <div style={{marginTop: 14}} className="grid-2">
+                    <KvEditor label="Shared Headers" kvs={sharedHeaders} setKvs={setSharedHeaders}/>
+                    <KvEditor label="Shared Query params" kvs={sharedQuery} setKvs={setSharedQuery}/>
                 </div>
 
                 {/* APIs */}
-                <div style={{ marginTop: 14 }}>
-                    <ApiForm title="A) Primary API" api={primary} setApi={setPrimary} />
+                <div style={{marginTop: 14}}>
+                    <ApiForm title="A) Primary API" api={primary} setApi={setPrimary}/>
                 </div>
 
-                <div style={{ marginTop: 14 }} className="card">
+                <div style={{marginTop: 14}} className="card">
                     <SectionHeader
                         title="B) Other APIs"
                         right={
@@ -532,7 +551,15 @@ export default function ApiDiff() {
                                 onClick={() =>
                                     setOthers((prev) => [
                                         ...prev,
-                                        { name: `other-${prev.length + 1}`, method: "GET", url: "", headers: {}, query: {}, queryKeyMap: {}, extract: "" }
+                                        {
+                                            name: `other-${prev.length + 1}`,
+                                            method: "GET",
+                                            url: "",
+                                            headers: {},
+                                            query: {},
+                                            queryKeyMap: {},
+                                            extract: ""
+                                        }
                                     ])
                                 }
                             >
@@ -541,11 +568,11 @@ export default function ApiDiff() {
                         }
                     />
 
-                    <div className="stack" style={{ marginTop: 12 }}>
+                    <div className="stack" style={{marginTop: 12}}>
                         {others.map((api, idx) => (
                             <div key={idx} className="stack">
-                                <ApiForm title={`Other #${idx + 1}`} api={api} setApi={setOtherAt(idx)} />
-                                <div className="row" style={{ justifyContent: "flex-end" }}>
+                                <ApiForm title={`Other #${idx + 1}`} api={api} setApi={setOtherAt(idx)}/>
+                                <div className="row" style={{justifyContent: "flex-end"}}>
                                     <button
                                         className="btn btn--danger"
                                         onClick={() => setOthers((prev) => prev.filter((_, i) => i !== idx))}
@@ -560,7 +587,7 @@ export default function ApiDiff() {
                 </div>
 
                 {/* Run */}
-                <div style={{ marginTop: 14 }} className="row">
+                <div style={{marginTop: 14}} className="row">
                     <button className="btn btn--primary" onClick={runCompare} disabled={loading}>
                         {loading ? "Comparing..." : "Compare"}
                     </button>
@@ -571,63 +598,87 @@ export default function ApiDiff() {
 
                 {/* Results */}
                 {result && (
-                    <div style={{ marginTop: 16 }} className="stack">
-                        <SectionHeader title="Result" right={<span className="badge">{result.length} report(s)</span>} />
+                    <div style={{marginTop: 16}} className="stack">
+                        <SectionHeader title="Result" right={<span className="badge">{result.length} report(s)</span>}/>
+                        {result.map((rep, idx) => {
+                            const ok = isReportOk(rep);
 
-                        {result.map((rep, idx) => (
-                            <div key={idx} className="card">
-                                <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
-                                    <div style={{ fontWeight: 800 }}>
-                                        {rep.caseName || "(case)"} — <span className="code">{rep.primary}</span> vs{" "}
-                                        <span className="code">{rep.other}</span>
-                                    </div>
-                                    {rep.truncated ? <span className="badge badge--danger">TRUNCATED</span> : <span className="badge">OK</span>}
-                                </div>
-
-                                <pre className="pre">{JSON.stringify(rep.summary, null, 2)}</pre>
-
-                                {rep.fieldDiffs?.length > 0 && (
-                                    <div style={{ marginTop: 12 }} className="stack">
-                                        <div className="row" style={{ justifyContent: "space-between" }}>
-                                            <div style={{ fontWeight: 800 }}>Field diffs <span className="badge">up to 50</span></div>
-                                            <span className="badge">{rep.fieldDiffs.length} total</span>
+                            return (
+                                <div key={idx} className={`card ${ok ? "card--ok" : "card--bad"}`}>
+                                    <div className="row"
+                                         style={{justifyContent: "space-between", alignItems: "center"}}>
+                                        <div style={{fontWeight: 800}}>
+                                            {rep.caseName || "(case)"} — <span
+                                            className="code">{rep.primary}</span> vs{" "}
+                                            <span className="code">{rep.other}</span>
                                         </div>
 
-                                        <div className="tableWrap">
-                                            <table className="table">
-                                                <thead>
-                                                <tr>
-                                                    <th>ID</th>
-                                                    <th>Field</th>
-                                                    <th>Primary</th>
-                                                    <th>Other</th>
-                                                    <th>Reason</th>
-                                                </tr>
-                                                </thead>
-                                                <tbody>
-                                                {rep.fieldDiffs.slice(0, 50).map((d, i) => (
-                                                    <tr key={i}>
-                                                        <td><span className="code">{d.id}</span></td>
-                                                        <td><span className="code">{d.field}</span></td>
-                                                        <td><span className="code">{JSON.stringify(d.primaryValue)}</span></td>
-                                                        <td><span className="code">{JSON.stringify(d.otherValue)}</span></td>
-                                                        <td>{d.reason}</td>
+                                        {rep.truncated ? (
+                                            <span className="badge badge--danger">TRUNCATED</span>
+                                        ) : ok ? (
+                                            <span className="badge badge--ok">OK</span>
+                                        ) : (
+                                            <span className="badge badge--danger">DIFF</span>
+                                        )}
+                                    </div>
+
+                                    <pre className="pre">{JSON.stringify(rep.summary, null, 2)}</pre>
+
+                                    {rep.fieldDiffs?.length > 0 && (
+                                        <div style={{marginTop: 12}} className="stack">
+                                            <div className="row" style={{justifyContent: "space-between"}}>
+                                                <div style={{fontWeight: 800}}>
+                                                    Field diffs <span className="badge">up to 50</span>
+                                                </div>
+                                                <span className="badge">{rep.fieldDiffs.length} total</span>
+                                            </div>
+
+                                            <div className="tableWrap">
+                                                <table className="table">
+                                                    <thead>
+                                                    <tr>
+                                                        <th>ID</th>
+                                                        <th>Field</th>
+                                                        <th>Primary</th>
+                                                        <th>Other</th>
+                                                        <th>Reason</th>
                                                     </tr>
-                                                ))}
-                                                </tbody>
-                                            </table>
+                                                    </thead>
+                                                    <tbody>
+                                                    {rep.fieldDiffs.slice(0, 50).map((d, i) => (
+                                                        <tr key={i}>
+                                                            <td>
+                                                                <span className="code">{d.id}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span className="code">{d.field}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span
+                                                                    className="code">{JSON.stringify(d.primaryValue)}</span>
+                                                            </td>
+                                                            <td>
+                                                                <span
+                                                                    className="code">{JSON.stringify(d.otherValue)}</span>
+                                                            </td>
+                                                            <td>{d.reason}</td>
+                                                        </tr>
+                                                    ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                                {rep.notes?.length > 0 && (
-                                    <div style={{ marginTop: 12 }}>
-                                        <div style={{ fontWeight: 800 }}>Notes</div>
-                                        <pre className="pre">{rep.notes.join("\n")}</pre>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
+                                    {rep.notes?.length > 0 && (
+                                        <div style={{marginTop: 12}}>
+                                            <div style={{fontWeight: 800}}>Notes</div>
+                                            <pre className="pre">{rep.notes.join("\n")}</pre>
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>

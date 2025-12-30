@@ -78,7 +78,7 @@ function App() {
                 <div className="appHeader__inner">
                     <Link to="/" className="appBrand">
                         <span className="appBrand__dot" />
-                        Tommi Tools
+                        My Tools
                     </Link>
 
                     <nav className="appNav">
@@ -141,8 +141,17 @@ function App() {
 
             {/* Footer */}
             <footer className="appFooter">
-                Copyright © 2025 <span className="appFooter__brand">tommitoan</span>
+                Copyright © 2026{" "}
+                <a
+                    className="appFooter__brand"
+                    href="https://github.com/tommitoan"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    tommitoan
+                </a>
             </footer>
+
         </div>
     );
 }

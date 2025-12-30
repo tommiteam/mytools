@@ -1,7 +1,7 @@
 [
   {
     "id": "builtin:listAgents",
-    "name": "List Agents (current)",
+    "name": "List Agents",
     "data": {
       "reqName": "agents-compare",
       "idKey": "OCode",
@@ -21,8 +21,8 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "http://localhost:25009/agents",
-        "headers": { "T": "xm6bmjxmxe4jo" },
+        "url": "https://57633ab821a4.ngrok-free.app/agents",
+        "headers": { "T": "xm6ydk9u9b63o" },
         "query": { "u": "M001" },
         "queryKeyMap": { "keyword": "Keyword", "limit": "Limit", "pageIndex": "PageIndex" },
         "extract": "Agents"
@@ -33,7 +33,45 @@
           "method": "GET",
           "url": "http://api.joker88.club/support/agents",
           "headers": {},
-          "query": { "t": "xm6bmjxmxe4jo" },
+          "query": { "t": "xm6ydk9u9b63o" },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:GetListCurrencyCodes",
+    "name": "Get List CurrencyCodes",
+    "data": {
+      "reqName": "currencyCodes-compare",
+      "idKey": "OCode",
+      "ignoreFields": "EndPointUrl,IP,Domain",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedQuery": [
+        { "k": "targetUserOCode", "v": "g3aqqxcmnpayn" },
+        { "k": "targetUserUsername", "v": "M003" }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://57633ab821a4.ngrok-free.app/currency-codes",
+        "headers": { "T": "xm6ydk9u9b63o" },
+        "query": { "u": "M001" },
+        "queryKeyMap": { },
+        "extract": "Data"
+      },
+      "others": [
+        {
+          "name": "joker-support",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/currency-codes",
+          "headers": {},
+          "query": { "t": "xm6ydk9u9b63o" },
           "queryKeyMap": {},
           "extract": ""
         }
