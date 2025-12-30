@@ -1,0 +1,43 @@
+[
+  {
+    "id": "builtin:listAgents",
+    "name": "List Agents (current)",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "OCode",
+      "ignoreFields": "Publisher,HasExternalApp,PersonStatus,StatusReason,EndPointUrl,IP,Domain",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedQuery": [
+        { "k": "keyword", "v": "d" },
+        { "k": "limit", "v": "20" },
+        { "k": "pageIndex", "v": "0" },
+        { "k": "targetUserOCode", "v": "g3aqqxcmnpayn" },
+        { "k": "targetUserUsername", "v": "M003" }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "http://localhost:25009/agents",
+        "headers": { "T": "xm6bmjxmxe4jo" },
+        "query": { "u": "M001" },
+        "queryKeyMap": { "keyword": "Keyword", "limit": "Limit", "pageIndex": "PageIndex" },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-support",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agents",
+          "headers": {},
+          "query": { "t": "xm6bmjxmxe4jo" },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  }
+]
