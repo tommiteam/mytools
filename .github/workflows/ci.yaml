@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+      - name: Update manifests in infra
+        run: |
+          git clone https://x-access-token:${{ secrets.INFRA_PAT }}@github.com/tommiteam/infra.git
+          cd infra/cluster/apps/mytools
+
+          kustomize edit set image ghcr.io/tommiteam/mytools=ghcr.io/tommiteam/mytools:${GITHUB_SHA}
+
+          git config user.email "ci@github.com"
+          git config user.name "GitHub Actions"
+          git commit -am "Update mytools image to ${GITHUB_SHA}" || echo "No changes"
+          git push origin HEAD:main
