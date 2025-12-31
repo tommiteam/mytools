@@ -55,6 +55,29 @@ function shallowEqualObj(a, b) {
     return true;
 }
 
+/** NEW: safe stringify for table rendering */
+function safeStringify(value, space = 2) {
+    try {
+        return JSON.stringify(value, null, space);
+    } catch {
+        try {
+            return String(value);
+        } catch {
+            return "[unserializable]";
+        }
+    }
+}
+
+/** NEW: short label for big objects/arrays */
+function valuePreview(value) {
+    if (value == null) return String(value);
+    if (typeof value === "string") return value;
+    if (typeof value === "number" || typeof value === "boolean") return String(value);
+    if (Array.isArray(value)) return `Array(${value.length})`;
+    if (typeof value === "object") return `Object(${Object.keys(value).length} keys)`;
+    return String(value);
+}
+
 /** ---------------------------
  * UI components
  * --------------------------*/
@@ -121,6 +144,34 @@ function KvEditor({ label, kvs, setKvs, hint }) {
                 ))}
             </div>
         </div>
+    );
+}
+
+/** NEW: Pretty JSON cell (preview + expandable pretty view) */
+function JsonCell({ value }) {
+    const pretty = useMemo(() => safeStringify(value, 2), [value]);
+    const compact = useMemo(() => safeStringify(value, 0), [value]);
+
+    const isTiny =
+        value == null ||
+        (typeof value === "string" && value.length <= 80) ||
+        (typeof value !== "object" && String(value).length <= 80) ||
+        compact.length <= 120;
+
+    if (isTiny) {
+        return <span className="code code--wrap">{compact}</span>;
+    }
+
+    const label = valuePreview(value);
+
+    return (
+        <details className="jsonDetails">
+            <summary className="jsonDetails__summary">
+                <span className="code jsonDetails__label">{label}</span>
+                <span className="code jsonDetails__preview">{compact}</span>
+            </summary>
+            <pre className="pre pre--mini pre--wrap">{pretty}</pre>
+        </details>
     );
 }
 
@@ -571,36 +622,35 @@ export default function ApiDiff() {
                                         )}
                                     </div>
 
-                                    <pre className="pre">{JSON.stringify(rep.summary, null, 2)}</pre>
+                                    <pre className="pre">{safeStringify(rep.summary, 2)}</pre>
 
-                                    {/* ✅ NEW: Always show raw responses for manual inspection */}
+                                    {/* raw responses */}
                                     <div style={{ marginTop: 12 }} className="stack">
                                         <details>
                                             <summary style={{ cursor: "pointer", fontWeight: 800 }}>Primary response (raw)</summary>
                                             <pre className="pre" style={{ maxHeight: 320, overflow: "auto" }}>
-                        {JSON.stringify(rep.primaryRaw ?? null, null, 2)}
+                        {safeStringify(rep.primaryRaw ?? null, 2)}
                       </pre>
                                         </details>
 
                                         <details>
                                             <summary style={{ cursor: "pointer", fontWeight: 800 }}>Other response (raw)</summary>
                                             <pre className="pre" style={{ maxHeight: 320, overflow: "auto" }}>
-                        {JSON.stringify(rep.otherRaw ?? null, null, 2)}
+                        {safeStringify(rep.otherRaw ?? null, 2)}
                       </pre>
                                         </details>
 
-                                        {/* Optional: extracted arrays too (handy for Agents/Events extract paths) */}
                                         <details>
                                             <summary style={{ cursor: "pointer", fontWeight: 800 }}>Primary extracted items</summary>
                                             <pre className="pre" style={{ maxHeight: 320, overflow: "auto" }}>
-                        {JSON.stringify(rep.primaryItems ?? null, null, 2)}
+                        {safeStringify(rep.primaryItems ?? null, 2)}
                       </pre>
                                         </details>
 
                                         <details>
                                             <summary style={{ cursor: "pointer", fontWeight: 800 }}>Other extracted items</summary>
                                             <pre className="pre" style={{ maxHeight: 320, overflow: "auto" }}>
-                        {JSON.stringify(rep.otherItems ?? null, null, 2)}
+                        {safeStringify(rep.otherItems ?? null, 2)}
                       </pre>
                                         </details>
                                     </div>
@@ -634,12 +684,15 @@ export default function ApiDiff() {
                                                             <td>
                                                                 <span className="code">{d.field}</span>
                                                             </td>
+
+                                                            {/* ✅ FIXED: JSON preview + expand */}
                                                             <td>
-                                                                <span className="code">{JSON.stringify(d.primaryValue)}</span>
+                                                                <JsonCell value={d.primaryValue} />
                                                             </td>
                                                             <td>
-                                                                <span className="code">{JSON.stringify(d.otherValue)}</span>
+                                                                <JsonCell value={d.otherValue} />
                                                             </td>
+
                                                             <td>{d.reason}</td>
                                                         </tr>
                                                     ))}

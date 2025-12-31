@@ -19,13 +19,11 @@
     --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 
-    /* NEW: code blocks should always be readable */
     --code-bg: rgba(0, 0, 0, 0.22);
     --code-border: rgba(255, 255, 255, 0.12);
     --code-text: rgba(255, 255, 255, 0.92);
 }
 
-/* Light mode: keep the page light-ish, but DON'T make code blocks pure white */
 @media (prefers-color-scheme: light) {
     :root {
         color-scheme: light;
@@ -39,8 +37,7 @@
         --muted2: rgba(0, 0, 0, 0.52);
         --shadow2: 0 6px 18px rgba(0, 0, 0, 0.08);
 
-        /* NEW: code blocks in light mode are still darker for readability */
-        --code-bg: rgba(15, 23, 42, 0.92);          /* slate-ish */
+        --code-bg: rgba(15, 23, 42, 0.92);
         --code-border: rgba(15, 23, 42, 0.18);
         --code-text: rgba(255, 255, 255, 0.94);
     }
@@ -113,57 +110,38 @@ html, body {
 }
 
 @media (max-width: 980px) {
-    .grid-4 {
-        grid-template-columns: 1fr 1fr;
-    }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 720px) {
-    .grid-2,
-    .grid-4 {
-        grid-template-columns: 1fr;
-    }
+    .grid-2, .grid-4 { grid-template-columns: 1fr; }
 }
 
-/* Presets row layout: keep left + right on same line */
 .presetsRow{
     display: flex;
     gap: 12px;
     align-items: flex-end;
 }
 
-/* Left side grows */
 .presetsRow__left{
     flex: 1 1 auto;
     min-width: 320px;
 }
 
-/* Right side keeps its width but can shrink */
 .presetsRow__right{
     flex: 0 1 520px;
     min-width: 360px;
 }
 
-/* Make sure input can shrink inside a flex row */
 .row--tight > .input{
     flex: 1 1 auto;
     min-width: 140px;
 }
 
-/* Reduce horizontal spacing a bit */
-.row--tight{
-    gap: 8px;
-}
+.row--tight{ gap: 8px; }
 
-/* Only stack on smaller screens */
 @media (max-width: 900px){
-    .presetsRow{
-        flex-direction: column;
-        align-items: stretch;
-    }
-    .presetsRow__right{
-        min-width: 0;
-        flex: 1 1 auto;
-    }
+    .presetsRow{ flex-direction: column; align-items: stretch; }
+    .presetsRow__right{ min-width: 0; flex: 1 1 auto; }
 }
 
 .field label {
@@ -187,15 +165,10 @@ html, body {
 }
 
 @media (prefers-color-scheme: light) {
-    .input,
-    .select {
-        background: rgba(0, 0, 0, 0.03);
-    }
+    .input, .select { background: rgba(0, 0, 0, 0.03); }
 }
 
-.input::placeholder {
-    color: var(--muted2);
-}
+.input::placeholder { color: var(--muted2); }
 
 .input:focus,
 .select:focus {
@@ -225,9 +198,7 @@ html, body {
 }
 
 @media (prefers-color-scheme: light) {
-    .btn {
-        background: rgba(0, 0, 0, 0.03);
-    }
+    .btn { background: rgba(0, 0, 0, 0.03); }
 }
 
 .btn:hover {
@@ -235,14 +206,10 @@ html, body {
     transform: translateY(-1px);
 }
 @media (prefers-color-scheme: light) {
-    .btn:hover {
-        background: rgba(0, 0, 0, 0.06);
-    }
+    .btn:hover { background: rgba(0, 0, 0, 0.06); }
 }
 
-.btn:active {
-    transform: translateY(0px);
-}
+.btn:active { transform: translateY(0px); }
 
 .btn:focus {
     outline: none;
@@ -265,9 +232,7 @@ html, body {
     background: rgba(239, 68, 68, 0.14);
 }
 
-.btn--ghost {
-    background: transparent;
-}
+.btn--ghost { background: transparent; }
 
 .btn--sm {
     padding: 8px 10px;
@@ -288,9 +253,7 @@ html, body {
 }
 
 @media (prefers-color-scheme: light) {
-    .badge {
-        background: rgba(0, 0, 0, 0.03);
-    }
+    .badge { background: rgba(0, 0, 0, 0.03); }
 }
 
 .badge--danger {
@@ -307,9 +270,7 @@ html, body {
 }
 
 @media (prefers-color-scheme: light) {
-    .kv {
-        background: rgba(0, 0, 0, 0.02);
-    }
+    .kv { background: rgba(0, 0, 0, 0.02); }
 }
 
 .kv__head {
@@ -320,10 +281,7 @@ html, body {
     margin-bottom: 10px;
 }
 
-.kv__title {
-    font-weight: 750;
-    font-size: 13px;
-}
+.kv__title { font-weight: 750; font-size: 13px; }
 
 .kv__hint {
     font-size: 12px;
@@ -331,10 +289,7 @@ html, body {
     margin-top: 4px;
 }
 
-.kv__rows {
-    display: grid;
-    gap: 8px;
-}
+.kv__rows { display: grid; gap: 8px; }
 
 .kv__row {
     display: grid;
@@ -343,9 +298,7 @@ html, body {
     align-items: center;
 }
 
-.kv__key {
-    font-family: var(--mono);
-}
+.kv__key { font-family: var(--mono); }
 
 .tableWrap {
     overflow: auto;
@@ -353,13 +306,20 @@ html, body {
     border-radius: var(--radius);
 }
 
+/* ✅ IMPORTANT: fixed layout so cells WRAP and don't become 10km wide */
 .table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
-    min-width: 820px;
+    table-layout: fixed;   /* key change */
     font-size: 13px;
+    min-width: 100%;       /* remove forced min-width */
 }
+
+/* Optional: give some columns consistent width */
+.table th:nth-child(1), .table td:nth-child(1) { width: 200px; } /* ID */
+.table th:nth-child(2), .table td:nth-child(2) { width: 160px; } /* Field */
+.table th:nth-child(5), .table td:nth-child(5) { width: 180px; } /* Reason */
 
 .table thead th {
     position: sticky;
@@ -374,9 +334,7 @@ html, body {
 }
 
 @media (prefers-color-scheme: light) {
-    .table thead th {
-        background: rgba(255, 255, 255, 0.86);
-    }
+    .table thead th { background: rgba(255, 255, 255, 0.86); }
 }
 
 .table tbody td {
@@ -386,18 +344,12 @@ html, body {
 }
 
 @media (prefers-color-scheme: light) {
-    .table tbody td {
-        border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    }
+    .table tbody td { border-bottom: 1px solid rgba(0, 0, 0, 0.06); }
 }
 
-.table tbody tr:nth-child(odd) td {
-    background: rgba(255, 255, 255, 0.03);
-}
+.table tbody tr:nth-child(odd) td { background: rgba(255, 255, 255, 0.03); }
 @media (prefers-color-scheme: light) {
-    .table tbody tr:nth-child(odd) td {
-        background: rgba(0, 0, 0, 0.02);
-    }
+    .table tbody tr:nth-child(odd) td { background: rgba(0, 0, 0, 0.02); }
 }
 
 .code {
@@ -409,9 +361,37 @@ html, body {
     background: rgba(255, 255, 255, 0.06);
 }
 @media (prefers-color-scheme: light) {
-    .code {
-        background: rgba(0, 0, 0, 0.04);
-    }
+    .code { background: rgba(0, 0, 0, 0.04); }
+}
+
+/* ✅ Wrap long content inside code badges */
+.code--wrap {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* ✅ JSON expander inside cells */
+.jsonDetails { max-width: 100%; }
+
+.jsonDetails__summary {
+    cursor: pointer;
+    display: grid;
+    gap: 6px;
+}
+
+.jsonDetails__label {
+    opacity: 0.9;
+    display: inline-flex;
+    width: fit-content;
+}
+
+.jsonDetails__preview {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* IMPORTANT: pre is now consistent in ALL modes */
@@ -427,7 +407,19 @@ html, body {
     line-height: 1.45;
 }
 
-/* Alert */
+/* Smaller expansion pre inside table */
+.pre--mini {
+    margin-top: 8px;
+    max-height: 220px;
+}
+
+/* Wrap pretty JSON (no long horizontal scrolling) */
+.pre--wrap {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
 .alert {
     margin-top: 10px;
     padding: 10px 12px;
@@ -438,12 +430,9 @@ html, body {
 }
 
 @media (prefers-color-scheme: light) {
-    .alert {
-        color: rgba(0, 0, 0, 0.85);
-    }
+    .alert { color: rgba(0, 0, 0, 0.85); }
 }
 
-/* Section header */
 .secHead {
     display: flex;
     justify-content: space-between;
@@ -451,30 +440,20 @@ html, body {
     gap: 12px;
     margin-bottom: 10px;
 }
-.secHead__title {
-    font-weight: 800;
-    letter-spacing: 0.2px;
-}
-.secHead__right {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+.secHead__title { font-weight: 800; letter-spacing: 0.2px; }
+.secHead__right { display: flex; align-items: center; gap: 8px; }
 
-/* Make native selects less blinding */
 .select {
     background-color: rgba(255, 255, 255, 0.06);
     color: var(--text);
     border: 1px solid var(--border);
 }
 
-/* Some browsers respect option styling */
 .select option {
     background-color: #0b1220;
     color: rgba(255, 255, 255, 0.92);
 }
 
-/* Light mode */
 @media (prefers-color-scheme: light) {
     .select option {
         background-color: #ffffff;
@@ -482,7 +461,6 @@ html, body {
     }
 }
 
-/* Result highlight */
 .card--ok{
     border-color: rgba(34, 197, 94, 0.55);
     background: linear-gradient(180deg, rgba(34, 197, 94, 0.14), var(--panel));
@@ -499,7 +477,6 @@ html, body {
     color: rgba(255, 255, 255, 0.88);
 }
 
-/* High contrast / forced colors mode (Windows) */
 @media (forced-colors: active) {
     .card, .pre, .kv, .badge, .btn, .input, .select, .tableWrap, .code {
         forced-color-adjust: none;
