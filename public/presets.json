@@ -1,11 +1,11 @@
 [
   {
     "id": "builtin:listAgents",
-    "name": "List Agents",
+    "name": "ListAgents",
     "data": {
       "reqName": "agents-compare",
       "idKey": "OCode",
-      "ignoreFields": "Publisher,HasExternalApp,PersonStatus,StatusReason,EndPointUrl,IP,Domain",
+      "ignoreFields": "EndPointUrl,IP,Domain",
       "compareFields": "",
       "compareMode": "union",
       "maxDiffs": 5000,
@@ -29,7 +29,7 @@
       },
       "others": [
         {
-          "name": "joker-support",
+          "name": "joker-api",
           "method": "GET",
           "url": "http://api.joker88.club/support/agents",
           "headers": {},
@@ -42,11 +42,11 @@
   },
   {
     "id": "builtin:GetListCurrencyCodes",
-    "name": "Get List CurrencyCodes",
+    "name": "GetListCurrencyCodes",
     "data": {
       "reqName": "currencyCodes-compare",
       "idKey": "OCode",
-      "ignoreFields": "EndPointUrl,IP,Domain",
+      "ignoreFields": "",
       "compareFields": "",
       "compareMode": "union",
       "maxDiffs": 5000,
@@ -67,13 +67,57 @@
       },
       "others": [
         {
-          "name": "joker-support",
+          "name": "joker-api",
           "method": "GET",
           "url": "http://api.joker88.club/support/currency-codes",
           "headers": {},
           "query": { "t": "xm6ydk9u9b63o" },
           "queryKeyMap": {},
           "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:GetListEvents",
+    "name": "GetListEvents",
+    "data": {
+      "reqName": "events-compare",
+      "idKey": "Name",
+      "ignoreFields": "",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedQuery": [
+        { "k": "u", "v": "M001" },
+        { "k": "targetUserOCode", "v": "xe6kg6qxk9gm4" },
+        { "k": "currencyCodes", "v": "MYR" },
+        { "k": "personOCode", "v": "xjro7btqw45nk" }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://57633ab821a4.ngrok-free.app/events",
+        "headers": { "T": "xm6p98oo7p63o" },
+        "query": { "StartDate": "2025-10-02T00:17:00.000Z", "EndDate": "2025-11-11T00:17:00.000Z" },
+        "queryKeyMap": { "currencyCodes": "CurrencyCodes", "personOCode": "PersonOCode" },
+        "extract": "Events"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agent/xjro7btqw45nk/events",
+          "headers": {},
+          "query": { "t": "xm6p98oo7p63o", "startDate": "2025-10-01", "endDate": "2025-10-31" },
+          "queryKeyMap": {},
+          "extract": "",
+          "fieldMap": {
+            "StartTime": "StartDate",
+            "EndTime": "EndDate"
+          }
         }
       ]
     }
