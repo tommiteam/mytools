@@ -21,7 +21,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://57633ab821a4.ngrok-free.app/agents",
+        "url": "https://01c6d6afa7ed.ngrok-free.app/agents",
         "headers": { "T": "xm6ydk9u9b63o" },
         "query": { "u": "M001" },
         "queryKeyMap": { "keyword": "Keyword", "limit": "Limit", "pageIndex": "PageIndex" },
@@ -59,7 +59,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://57633ab821a4.ngrok-free.app/currency-codes",
+        "url": "https://01c6d6afa7ed.ngrok-free.app/currency-codes",
         "headers": { "T": "xm6ydk9u9b63o" },
         "query": { "u": "M001" },
         "queryKeyMap": { },
@@ -99,9 +99,9 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://57633ab821a4.ngrok-free.app/events",
+        "url": "https://01c6d6afa7ed.ngrok-free.app/events",
         "headers": { "T": "xm6p98oo7p63o" },
-        "query": { "StartDate": "2025-10-02T00:17:00.000Z", "EndDate": "2025-11-11T00:17:00.000Z" },
+        "query": { "StartDate": "2025-10-02T00:17:00.000Z", "EndDate": "2025-11-01T00:17:00.000Z" },
         "queryKeyMap": { "currencyCodes": "CurrencyCodes", "personOCode": "PersonOCode" },
         "extract": "Events"
       },
@@ -118,6 +118,58 @@
             "StartTime": "StartDate",
             "EndTime": "EndDate"
           }
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:GetGameSummaryByPeriod",
+    "name": "GetGameSummaryByPeriod",
+    "data": {
+      "reqName": "game-summary-period-compare",
+      "idKey": "StartTime",
+      "ignoreFields": "",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedQuery": [
+        { "k": "u", "v": "M001" },
+        { "k": "currencyCodes", "v": "HKD" },
+        { "k": "personOCode", "v": "xm6ds3k3rg94k" },
+        { "k": "periodType", "v": "" },
+        { "k": "gameCodes", "v": "" },
+        { "k": "targetCurrencyCode", "v": "" }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://01c6d6afa7ed.ngrok-free.app/report/game/summary",
+        "headers": { "T": "xm6p98oo7p63o" },
+        "query": { "StartDate": "2025-10-02T00:17:00.000Z", "EndDate": "2025-11-01T00:17:00.000Z", "targetUserUsername": "M003" },
+        "queryKeyMap": {
+          "personOCode": "PersonOCode",
+          "periodType": "PeriodType",
+          "gameCodes": "GameCodes",
+          "targetCurrencyCode": "TargetCurrencyCode",
+          "currencyCodes": "CurrencyCodes"
+        },
+        "extract": "GameSummaries"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agent/xm6ds3k3rg94k/game-summary-period",
+          "headers": {},
+          "query": { "t": "xm6p98oo7p63o", "startDate": "2025-10-01", "endDate": "2025-10-31", "targetUserOCode": "g3aqqxcmnpayn" },
+          "queryKeyMap": {
+            "currencyCodes": "currencyCodes",
+            "periodType": "periodType",
+            "targetUserOCode": "targetUserOCode"
+          },
+          "extract": ""
         }
       ]
     }
