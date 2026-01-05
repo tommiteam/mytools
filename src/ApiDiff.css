@@ -318,7 +318,7 @@ html, body {
 
 /* Optional: give some columns consistent width */
 .table th:nth-child(1), .table td:nth-child(1) { width: 200px; } /* ID */
-.table th:nth-child(2), .table td:nth-child(2) { width: 160px; } /* Field */
+.table th:nth-child(2), .table td:nth-child(2) { width: 300px; } /* Field */
 .table th:nth-child(5), .table td:nth-child(5) { width: 180px; } /* Reason */
 
 .table thead th {
