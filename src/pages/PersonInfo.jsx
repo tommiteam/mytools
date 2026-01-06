@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { saveToHistory, loadHistory } from "../utils/history";
+import {useState, useEffect, useRef} from "react";
+import {useLocation, useNavigate} from "react-router-dom";
+import {saveToHistory, loadHistory} from "../utils/history";
 import CopyCell from "../components/CopyCell";
-import { BASE_URL } from "../utils/config";
+import {BASE_URL} from "../utils/config";
+import "../PersonInfo.css";
 
 function PersonInfo() {
     const [linkCopied, setLinkCopied] = useState(false);
@@ -23,7 +24,7 @@ function PersonInfo() {
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
-        const newParams = { PersonID: [], PersonOCode: [], Username: [] };
+        const newParams = {PersonID: [], PersonOCode: [], Username: []};
 
         let hasQuery = false;
         for (const key of Object.keys(newParams)) {
@@ -36,7 +37,7 @@ function PersonInfo() {
 
         if (hasQuery) hasInitialQueryParams.current = true;
 
-        setParams((prev) => ({ ...prev, ...newParams }));
+        setParams((prev) => ({...prev, ...newParams}));
 
         setHistory(loadHistory());
     }, [location.search]);
@@ -51,7 +52,7 @@ function PersonInfo() {
         if (hasAnyValue) {
             fetchToken();
             hasInitialQueryParams.current = false;
-            navigate("/person", { replace: true });
+            navigate("/person", {replace: true});
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [params]);
@@ -60,19 +61,19 @@ function PersonInfo() {
         setParams((prev) => {
             const updated = [...prev[name]];
             updated[index] = value;
-            return { ...prev, [name]: updated };
+            return {...prev, [name]: updated};
         });
     };
 
     const addParamField = (name) => {
-        setParams((prev) => ({ ...prev, [name]: [...prev[name], ""] }));
+        setParams((prev) => ({...prev, [name]: [...prev[name], ""]}));
     };
 
     const removeParamField = (name, index) => {
         setParams((prev) => {
             const updated = [...prev[name]];
             updated.splice(index, 1);
-            return { ...prev, [name]: updated.length ? updated : [""] };
+            return {...prev, [name]: updated.length ? updated : [""]};
         });
     };
 
@@ -96,7 +97,7 @@ function PersonInfo() {
         try {
             const res = await fetch(`${BASE_URL}/token?${query}`, {
                 method: "GET",
-                headers: { "ngrok-skip-browser-warning": "true" },
+                headers: {"ngrok-skip-browser-warning": "true"},
             });
             if (!res.ok) throw new Error(`Server error: ${res.status}`);
             const json = await res.json();
@@ -145,13 +146,13 @@ function PersonInfo() {
     };
 
     const clearAllInputs = () => {
-        setParams({ PersonID: [""], PersonOCode: [""], Username: [""] });
+        setParams({PersonID: [""], PersonOCode: [""], Username: [""]});
         setData(null);
-        navigate("/person", { replace: true });
+        navigate("/person", {replace: true});
     };
 
     return (
-        <div className="pageShell">
+        <div className="pageShell personPage">
             <div className="pageContainer">
                 <div className="pageCard">
                     <div className="pageHead">
@@ -160,15 +161,15 @@ function PersonInfo() {
                             <p className="pageSub">Search by PersonID / PersonOCode / Username.</p>
                         </div>
 
-                        <div className="row" style={{ gap: 10 }}>
+                        <div className="row" style={{gap: 10}}>
                             <button
                                 onClick={fetchToken}
                                 className={`btn btn--primary ${loading ? "isLoading" : ""}`}
                                 disabled={loading}
                             >
                                 {loading ? (
-                                    <span className="row" style={{ gap: 8 }}>
-                    <span className="spinner" />
+                                    <span className="row" style={{gap: 8}}>
+                    <span className="spinner"/>
                     Loading...
                   </span>
                                 ) : (
@@ -189,15 +190,15 @@ function PersonInfo() {
                         </div>
                     </div>
 
-                    <div className="grid3" style={{ marginTop: 14 }}>
+                    <div className="grid3" style={{marginTop: 14}}>
                         {["PersonID", "PersonOCode", "Username"].map((field) => (
                             <div key={field} className="section">
                                 <div className="sectionHead">
-                                    <div className="sectionTitle">{field}</div>
-                                    <button className="btn btn--sm" onClick={() => addParamField(field)}>
-                                        + Add
-                                    </button>
+                                    <div className="sectionHeadLeft">
+                                      <div className="sectionTitle">{field}</div>
+                                    </div>
                                 </div>
+
 
                                 <div className="stack">
                                     {params[field].map((val, idx) => (
@@ -225,20 +226,26 @@ function PersonInfo() {
                                         </div>
                                     ))}
                                 </div>
+
+                                <div className="sectionHead" style={{marginTop: 10}}>
+                                    <div className="sectionHeadLeft">
+                                        <button className="btn btn--sm" onClick={() => addParamField(field)}>+ Add</button>
+                                    </div>
+                                </div>
                             </div>
                         ))}
                     </div>
 
                     {/* Response */}
                     {data?.data?.length > 0 && (
-                        <div className="section" style={{ marginTop: 18 }}>
+                        <div className="section" style={{marginTop: 18}}>
                             <div className="sectionHead">
                                 <div className="sectionTitle">Response</div>
                                 <span className="badge">{data.data.length} row(s)</span>
                             </div>
 
                             <div className="tableWrap">
-                                <table className="table">
+                                <table className="table personTable">
                                     <thead>
                                     <tr>
                                         <th>#</th>
@@ -265,17 +272,17 @@ function PersonInfo() {
 
                                                 <td>
                                                     <div className="cellStack">
-                                                        <CopyCell>{item.PersonID}</CopyCell>
-                                                        <CopyCell>{item.PersonOCode}</CopyCell>
+                                                        <CopyCell as="div">{item.PersonID}</CopyCell>
+                                                        <CopyCell as="div">{item.PersonOCode}</CopyCell>
                                                     </div>
                                                 </td>
 
                                                 <td>
                                                     <div className="cellStack">
-                                                        <CopyCell className={offlineSession ? "pillDanger" : ""}>
+                                                        <CopyCell as="div" className={offlineSession ? "pillDanger" : ""}>
                                                             {item.SessionID}
                                                         </CopyCell>
-                                                        <CopyCell className={offlineSession ? "pillDanger" : ""}>
+                                                        <CopyCell as="div" className={offlineSession ? "pillDanger" : ""}>
                                                             {item.SessionOCode}
                                                         </CopyCell>
                                                     </div>
@@ -283,8 +290,8 @@ function PersonInfo() {
 
                                                 <td>
                                                     <div className="cellStack">
-                                                        <CopyCell>{item.UplineID}</CopyCell>
-                                                        <CopyCell>{item.UplineOCode}</CopyCell>
+                                                        <CopyCell as="div">{item.UplineID}</CopyCell>
+                                                        <CopyCell as="div">{item.UplineOCode}</CopyCell>
                                                     </div>
                                                 </td>
 
@@ -304,10 +311,10 @@ function PersonInfo() {
 
                     {/* History */}
                     {history.length > 0 && (
-                        <div className="section" style={{ marginTop: 18 }}>
+                        <div className="section" style={{marginTop: 18}}>
                             <div className="sectionHead">
                                 <div className="sectionTitle">History</div>
-                                <div className="row" style={{ gap: 10 }}>
+                                <div className="row" style={{gap: 10}}>
                                     <span className="badge">click to reuse</span>
                                     <button onClick={handleClearAllHistory} className="btn btn--danger btn--sm">
                                         Clear All

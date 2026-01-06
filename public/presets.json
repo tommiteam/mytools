@@ -1,7 +1,56 @@
 [
   {
+    "id": "builtin:GetListAccessUsers",
+    "name": "GetListAccessUsers",
+    "data": {
+      "reqName": "list-access-users-compare",
+      "idKey": "Username",
+      "ignoreFields": "",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "u",
+          "v": "M001"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/access-users",
+        "headers": {
+          "T": "xm6p98oo7p63o"
+        },
+        "query": {},
+        "queryKeyMap": {},
+        "extract": "AccessUsers"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/user/access-users",
+          "headers": {},
+          "query": {
+            "t": "xm6p98oo7p63o"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
     "id": "builtin:listAgents",
-    "name": "ListAgents",
+    "name": "ListAgents v01 (limit50-keyword=D)",
     "data": {
       "reqName": "agents-compare",
       "idKey": "OCode",
@@ -10,21 +59,33 @@
       "compareMode": "union",
       "maxDiffs": 5000,
       "timeoutSec": 20,
-      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
       "sharedQuery": [
-        { "k": "keyword", "v": "d" },
-        { "k": "limit", "v": "20" },
+        { "k": "keyword", "v": "D" },
+        { "k": "limit", "v": "50" },
         { "k": "pageIndex", "v": "0" },
-        { "k": "targetUserOCode", "v": "g3aqqxcmnpayn" },
-        { "k": "targetUserUsername", "v": "M003" }
+        { "k": "u", "v": "M001" }
       ],
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://0be4b9aa5382.ngrok-free.app/agents",
-        "headers": { "T": "xm6ydk9u9b63o" },
-        "query": { "u": "M001" },
-        "queryKeyMap": { "keyword": "Keyword", "limit": "Limit", "pageIndex": "PageIndex" },
+        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
         "extract": "Agents"
       },
       "others": [
@@ -33,7 +94,64 @@
           "method": "GET",
           "url": "http://api.joker88.club/support/agents",
           "headers": {},
-          "query": { "t": "xm6ydk9u9b63o" },
+          "query": {
+            "t": "xm6ydk9u9b63o", "targetUserOCode": "g3aqqxcmnpayn"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:listAgents02",
+    "name": "ListAgents v02 (limit20-no keyword)",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "OCode",
+      "ignoreFields": "EndPointUrl,IP,Domain",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        { "k": "keyword", "v": "" },
+        { "k": "limit", "v": "20" },
+        { "k": "pageIndex", "v": "0" },
+        { "k": "u", "v": "M001" }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agents",
+          "headers": {},
+          "query": {
+            "t": "xm6ydk9u9b63o", "targetUserOCode": "g3aqqxcmnpayn"
+          },
           "queryKeyMap": {},
           "extract": ""
         }
@@ -51,18 +169,33 @@
       "compareMode": "union",
       "maxDiffs": 5000,
       "timeoutSec": 20,
-      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
       "sharedQuery": [
-        { "k": "targetUserOCode", "v": "g3aqqxcmnpayn" },
-        { "k": "targetUserUsername", "v": "M003" }
+        {
+          "k": "targetUserOCode",
+          "v": "g3aqqxcmnpayn"
+        },
+        {
+          "k": "targetUserUsername",
+          "v": "M003"
+        }
       ],
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://0be4b9aa5382.ngrok-free.app/currency-codes",
-        "headers": { "T": "xm6ydk9u9b63o" },
-        "query": { "u": "M001" },
-        "queryKeyMap": { },
+        "url": "https://6028f8364028.ngrok-free.app/currency-codes",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "u": "M001"
+        },
+        "queryKeyMap": {},
         "extract": "Data"
       },
       "others": [
@@ -71,7 +204,9 @@
           "method": "GET",
           "url": "http://api.joker88.club/support/currency-codes",
           "headers": {},
-          "query": { "t": "xm6ydk9u9b63o" },
+          "query": {
+            "t": "xm6ydk9u9b63o"
+          },
           "queryKeyMap": {},
           "extract": ""
         }
@@ -89,18 +224,38 @@
       "compareMode": "union",
       "maxDiffs": 5000,
       "timeoutSec": 20,
-      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
       "sharedQuery": [
-        { "k": "u", "v": "M001" },
-        { "k": "currencyCodes", "v": "MYR" }
+        {
+          "k": "u",
+          "v": "M001"
+        },
+        {
+          "k": "currencyCodes",
+          "v": "MYR"
+        }
       ],
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://0be4b9aa5382.ngrok-free.app/events",
-        "headers": { "T": "xm6p98oo7p63o" },
-        "query": { "StartDate": "2025-10-02T17:00:00.000Z", "EndDate": "2025-11-01T17:00:00.000Z", "Username": "0LIVE88MYR" },
-        "queryKeyMap": { "currencyCodes": "CurrencyCodes", "personOCode": "PersonOCode" },
+        "url": "https://6028f8364028.ngrok-free.app/events",
+        "headers": {
+          "T": "xm6p98oo7p63o"
+        },
+        "query": {
+          "StartDate": "2025-10-02T17:00:00.000Z",
+          "EndDate": "2025-11-01T17:00:00.000Z",
+          "Username": "0LIVE88MYR"
+        },
+        "queryKeyMap": {
+          "currencyCodes": "CurrencyCodes",
+          "personOCode": "PersonOCode"
+        },
         "extract": "Events"
       },
       "others": [
@@ -109,7 +264,11 @@
           "method": "GET",
           "url": "http://api.joker88.club/support/agent/xjro7btqw45nk/events",
           "headers": {},
-          "query": { "t": "xm6p98oo7p63o", "startDate": "2025-10-01", "endDate": "2025-10-31" },
+          "query": {
+            "t": "xm6p98oo7p63o",
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-31"
+          },
           "queryKeyMap": {},
           "extract": "",
           "fieldMap": {
@@ -131,19 +290,40 @@
       "compareMode": "union",
       "maxDiffs": 5000,
       "timeoutSec": 20,
-      "sharedHeaders": [{ "k": "accept", "v": "application/json" }],
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
       "sharedQuery": [
-        { "k": "u", "v": "M001" },
-        { "k": "currencyCodes", "v": "HKD" },
-        { "k": "targetCurrencyCode", "v": "" }
+        {
+          "k": "u",
+          "v": "M001"
+        },
+        {
+          "k": "currencyCodes",
+          "v": "HKD"
+        },
+        {
+          "k": "targetCurrencyCode",
+          "v": ""
+        }
       ],
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://0be4b9aa5382.ngrok-free.app/report/game/summary",
-        "headers": { "T": "xm6p98oo7p63o" },
-        "query": { "StartDate": "2025-09-30T17:00:00.000Z", "EndDate": "2025-10-30T17:00:00.000Z", "targetUserUsername": "M003", "PeriodType": "Monthly",
-        "Username": "010"},
+        "url": "https://6028f8364028.ngrok-free.app/report/game/summary",
+        "headers": {
+          "T": "xm6p98oo7p63o"
+        },
+        "query": {
+          "StartDate": "2025-09-30T17:00:00.000Z",
+          "EndDate": "2025-10-30T17:00:00.000Z",
+          "targetUserUsername": "M003",
+          "PeriodType": "Monthly",
+          "Username": "010"
+        },
         "queryKeyMap": {
           "periodType": "PeriodType",
           "targetCurrencyCode": "TargetCurrencyCode",
@@ -157,13 +337,100 @@
           "method": "GET",
           "url": "http://api.joker88.club/support/agent/xm6ds3k3rg94k/game-summary-period",
           "headers": {},
-          "query": { "t": "xm6p98oo7p63o", "startDate": "2025-10-01", "endDate": "2025-10-31", "targetUserOCode": "g3aqqxcmnpayn" , "periodType":  "2" },
+          "query": {
+            "t": "xm6p98oo7p63o",
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-31",
+            "targetUserOCode": "g3aqqxcmnpayn",
+            "periodType": "2"
+          },
           "queryKeyMap": {
             "currencyCodes": "currencyCodes",
             "periodType": "periodType",
             "targetUserOCode": "targetUserOCode"
           },
           "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:GetWinlossSummaryByPeriod",
+    "name": "GetWinlossSummaryByPeriod",
+    "data": {
+      "reqName": "winloss-summary-period-compare",
+      "idKey": "StartDate",
+      "ignoreFields": "",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "u",
+          "v": "M001"
+        },
+        {
+          "k": "currencyCodes",
+          "v": "HKD"
+        },
+        {
+          "k": "targetCurrencyCode",
+          "v": "USD"
+        },
+        {
+          "k": "groupOCode",
+          "v": "qc8y6dypyeboy"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/report/person-winloss/summary",
+        "headers": {
+          "T": "xm6p98oo7p63o"
+        },
+        "query": {
+          "StartDate": "2025-09-30T17:00:00.000Z",
+          "EndDate": "2025-10-30T17:00:00.000Z",
+          "targetUserUsername": "M003",
+          "PeriodType": "Monthly",
+          "Username": "0"
+        },
+        "queryKeyMap": {
+          "periodType": "PeriodType",
+          "targetCurrencyCode": "TargetCurrencyCode",
+          "currencyCodes": "CurrencyCodes",
+          "groupOCode": "GroupOCode"
+        },
+        "extract": "WinlossSummaries"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agent/xm6dz6x97mrxs/winloss-period",
+          "headers": {},
+          "query": {
+            "t": "xm6p98oo7p63o",
+            "startDate": "2025-10-01",
+            "endDate": "2025-10-31",
+            "targetUserOCode": "g3aqqxcmnpayn",
+            "periodType": "2"
+          },
+          "queryKeyMap": {
+            "currencyCodes": "currencyCodes",
+            "periodType": "periodType",
+            "targetUserOCode": "targetUserOCode",
+            "groupOCode": "groupOCode"
+          },
+          "extract": "Winloss"
         }
       ]
     }

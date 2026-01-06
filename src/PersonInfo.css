@@ -1,0 +1,137 @@
+/* ---- Person page scoped fixes (keeps global theme) ---- */
+
+.personPage .table.personTable {
+    table-layout: fixed;          /* stable columns */
+    min-width: 980px;             /* still scrolls on smaller screens */
+}
+
+/* kill the global "hover highlights entire row" UX for THIS table */
+.personPage .table.personTable tbody tr:hover td {
+    background: transparent !important;
+}
+
+/* subtle zebra so rows are still readable */
+.personPage .table.personTable tbody tr:nth-child(odd) td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* allow wrapping generally, but we’ll control “code-ish” fields via ellipsis */
+.personPage .table.personTable th,
+.personPage .table.personTable td {
+    white-space: normal;
+}
+
+/* column widths */
+.personPage .table.personTable th:nth-child(1),
+.personPage .table.personTable td:nth-child(1) { width: 56px; text-align: center; }
+
+.personPage .table.personTable th:nth-child(2),
+.personPage .table.personTable td:nth-child(2) { width: 130px; }
+
+.personPage .table.personTable th:nth-child(3),
+.personPage .table.personTable td:nth-child(3) { width: 160px; }
+
+.personPage .table.personTable th:nth-child(4),
+.personPage .table.personTable td:nth-child(4) { width: 190px; }
+
+.personPage .table.personTable th:nth-child(5),
+.personPage .table.personTable td:nth-child(5) { width: 190px; }
+
+.personPage .table.personTable th:nth-child(6),
+.personPage .table.personTable td:nth-child(6) { width: 190px; }
+
+.personPage .table.personTable th:nth-child(7),
+.personPage .table.personTable td:nth-child(7) { width: 90px; }
+
+.personPage .table.personTable th:nth-child(8),
+.personPage .table.personTable td:nth-child(8) { width: 130px; }
+
+/* Make CopyCell look like a contained “pill” and only highlight itself */
+.personPage .personTable .copyCell {
+    text-align: left; /* override the global center */
+}
+
+.personPage .personTable .copyCell:hover {
+    background: transparent; /* don’t paint full td; paint the inner pill */
+}
+
+.personPage .personTable .copyCell__inner {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    padding: 7px 9px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(0, 0, 0, 0.14);
+
+    transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+}
+
+.personPage .personTable .copyCell:hover .copyCell__inner {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(124, 58, 237, 0.35);
+    transform: translateY(-1px);
+}
+
+.personPage .personTable .copyCell:active .copyCell__inner {
+    transform: translateY(0px);
+}
+
+/* Don’t let long IDs explode the table: show ellipsis (click still copies full) */
+.personPage .personTable .copyCell__text {
+    min-width: 0;
+    flex: 1 1 auto;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    font-family: var(--mono);
+    font-size: 12.5px;
+}
+
+/* keep the copy icon visible */
+.personPage .personTable .copyCell__badge {
+    flex: 0 0 auto;
+    opacity: 0.8;
+}
+
+/* stacked values should look like two clean pills, not “row-wide hover” */
+.personPage .personTable .cellStack {
+    display: grid;
+    gap: 8px;
+}
+
+/* OFFLINE style: paint the pill, but keep it ONE click target */
+.personPage .personTable .pillDanger .copyCell__inner {
+    border-color: rgba(239, 68, 68, 0.55);
+    background: rgba(239, 68, 68, 0.10);
+}
+
+.personPage .personTable .pillDanger:hover .copyCell__inner,
+.personPage .personTable .pillDanger:focus-within .copyCell__inner {
+    border-color: rgba(239, 68, 68, 0.70);
+    background: rgba(239, 68, 68, 0.14);
+}
+
+/* PersonLines: keep your multi-line look, but make it readable */
+.personPage .personTable td.monoSmall {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+}
+
+.personPage .sectionHead {
+    justify-content: flex-start; /* don’t push everything apart */
+}
+
+.personPage .sectionHeadLeft {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px; /* title + button spacing */
+}

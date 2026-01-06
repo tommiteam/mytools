@@ -1,48 +1,60 @@
 import { useMemo, useState } from "react";
 
-function CopyCell({ children, copyValue, className = "" }) {
-    const [copied, setCopied] = useState(false);
+export default function CopyCell({
+                                     as: Tag = "td",
+                                     copyValue,
+                                     className = "",
+                                     children,
+                                     title,
+                                 }) {
+    const [tip, setTip] = useState(null);
 
-    const text = useMemo(() => {
-        if (typeof children === "string") return children;
-        if (typeof children === "number") return String(children);
+    const textToCopy = useMemo(() => {
+        if (copyValue != null) return String(copyValue);
+
+        // Best-effort fallback: copy plain text children
+        if (typeof children === "string" || typeof children === "number") return String(children);
+
         return "";
-    }, [children]);
+    }, [copyValue, children]);
 
-    const isOffline = useMemo(() => {
-        const s = String(copyValue ?? text ?? "").trim().toUpperCase();
-        return s.includes("OFFLINE");
-    }, [copyValue, text]);
+    const clickableProps =
+        Tag === "div"
+            ? { role: "button", tabIndex: 0 }
+            : {};
 
-    const handleClick = async () => {
+    const onCopy = async () => {
+        if (!textToCopy) return;
+
         try {
-            const val = copyValue ?? (typeof children === "string" ? children : String(children ?? ""));
-            await navigator.clipboard.writeText(val);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 900);
-        } catch (err) {
-            console.error("Failed to copy", err);
+            await navigator.clipboard.writeText(textToCopy);
+            setTip("Copied!");
+            setTimeout(() => setTip(null), 800);
+        } catch (e) {
+            setTip("Copy failed");
+            setTimeout(() => setTip(null), 900);
         }
     };
 
-    return (
-        <td
-            className={`copyCell ${isOffline ? "copyCell--offline" : ""} ${className}`}
-            onClick={handleClick}
-            title="Click to copy"
-            style={{ overflow: "visible", verticalAlign: "middle" }}
-        >
-            {copied && (
-                <div className={`copyTip ${isOffline ? "copyTip--warn" : "copyTip--ok"}`}>
-                    "Copied!"
-                </div>
-            )}
+    const onKeyDown = (e) => {
+        if (e.key === "Enter" || e.key === " ") onCopy();
+    };
 
+    return (
+        <Tag
+            className={`copyCell ${className}`}
+            onClick={onCopy}
+            onKeyDown={Tag === "div" ? onKeyDown : undefined}
+            onMouseLeave={() => setTip(null)}
+            title={title}
+            {...clickableProps}
+        >
             <div className="copyCell__inner">
                 <span className="copyCell__text">{children}</span>
+                {/*<span className="copyCell__badge">⧉</span>*/}
             </div>
-        </td>
+
+            {tip && <div className={`copyTip ${tip === "Copied!" ? "copyTip--ok" : "copyTip--warn"}`}>{tip}</div>}
+        </Tag>
     );
 }
-
-export default CopyCell;

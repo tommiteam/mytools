@@ -453,13 +453,13 @@ body::before {
     color: var(--text);
 }
 
-.pillDanger {
-    border: 1px solid rgba(239, 68, 68, 0.55);
-    background: rgba(239, 68, 68, 0.12);
-    border-radius: 10px;
-    padding: 4px 8px;
-    display: inline-block;
-}
+/*.pillDanger {*/
+/*    border: 1px solid rgba(239, 68, 68, 0.55);*/
+/*    background: rgba(239, 68, 68, 0.12);*/
+/*    border-radius: 10px;*/
+/*    padding: 4px 8px;*/
+/*    display: inline-block;*/
+/*}*/
 
 /* mini toast for Share button */
 .shareWrap { position: relative; }
