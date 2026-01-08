@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
+// ApiDiff.jsx
+import { useEffect, useMemo, useState, useCallback, useRef } from "react";
 import "../ApiDiff.css";
 import { API_DIF_URL } from "../utils/config";
 
@@ -55,7 +56,6 @@ function shallowEqualObj(a, b) {
     return true;
 }
 
-/** NEW: safe stringify for table rendering */
 function safeStringify(value, space = 2) {
     try {
         return JSON.stringify(value, null, space);
@@ -68,7 +68,6 @@ function safeStringify(value, space = 2) {
     }
 }
 
-/** NEW: short label for big objects/arrays */
 function valuePreview(value) {
     if (value == null) return String(value);
     if (typeof value === "string") return value;
@@ -188,6 +187,85 @@ function JsonCell({ value }) {
     );
 }
 
+/** ✅ Option 2: Fully themed dropdown (no native <select>) */
+function PresetDropdown({ value, options, onChange, disabled }) {
+    const [open, setOpen] = useState(false);
+    const rootRef = useRef(null);
+    const selected = options.find((o) => o.id === value);
+
+    // close when clicking outside
+    useEffect(() => {
+        const onDoc = (e) => {
+            const root = rootRef.current;
+            if (!root) return;
+            if (!root.contains(e.target)) setOpen(false);
+        };
+        document.addEventListener("mousedown", onDoc);
+        return () => document.removeEventListener("mousedown", onDoc);
+    }, []);
+
+    // basic keyboard support
+    useEffect(() => {
+        if (!open) return;
+        const onKey = (e) => {
+            if (e.key === "Escape") setOpen(false);
+        };
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+    }, [open]);
+
+    return (
+        <div
+            ref={rootRef}
+            className={`dd ${open ? "dd--open" : ""} ${disabled ? "dd--disabled" : ""}`}
+        >
+            <button
+                type="button"
+                className="dd__btn"
+                onClick={() => !disabled && setOpen((v) => !v)}
+                disabled={disabled}
+                aria-haspopup="listbox"
+                aria-expanded={open}
+            >
+                <span className="dd__label">{selected ? selected.name : "Select preset"}</span>
+                <span className="dd__chev" aria-hidden="true">▾</span>
+            </button>
+
+            {open && !disabled && (
+                <>
+                    {/* Backdrop: reduces visual noise + makes the menu readable */}
+                    <div
+                        className="dd__backdrop"
+                        aria-hidden="true"
+                        onClick={() => setOpen(false)}
+                    />
+
+                    <div className="dd__menu" role="listbox">
+                        {options.map((p) => (
+                            <button
+                                key={p.id}
+                                type="button"
+                                className={`dd__item ${p.id === value ? "dd__item--active" : ""}`}
+                                onClick={() => {
+                                    onChange(p.id);
+                                    setOpen(false);
+                                }}
+                                role="option"
+                                aria-selected={p.id === value}
+                            >
+                                <div className="dd__itemName">
+                                    {p.name} {p.id.startsWith("user:") ? <span className="dd__tag">saved</span> : null}
+                                </div>
+                                <div className="dd__itemMeta">{p.id}</div>
+                            </button>
+                        ))}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+}
+
 function isReportOk(rep) {
     if (rep?.skipped) return false;
     const s = rep?.summary || {};
@@ -198,9 +276,8 @@ function ApiForm({ title, api, setApi, resetKey }) {
     const [headers, setHeaders] = useState(() => objToKv(api.headers));
     const [queryOverrides, setQueryOverrides] = useState(() => objToKv(api.query));
     const [queryKeyMap, setQueryKeyMap] = useState(() => objToKv(api.queryKeyMap));
-    const [fieldMap, setFieldMap] = useState(() => objToKv(api.fieldMap)); // ✅ NEW
+    const [fieldMap, setFieldMap] = useState(() => objToKv(api.fieldMap));
 
-    // ✅ only reset when preset changes
     useEffect(() => {
         setHeaders(objToKv(api.headers));
         setQueryOverrides(objToKv(api.query));
@@ -236,7 +313,6 @@ function ApiForm({ title, api, setApi, resetKey }) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [queryKeyMap]);
 
-    // ✅ NEW: response field mapping
     useEffect(() => {
         const nextFM = kvToObj(fieldMap);
         setApi((prev) => {
@@ -269,22 +345,12 @@ function ApiForm({ title, api, setApi, resetKey }) {
 
                 <div className="field" style={{ gridColumn: "1 / span 2" }}>
                     <label>URL</label>
-                    <input
-                        className="input"
-                        value={api.url || ""}
-                        onChange={(e) => setApi((p) => ({ ...p, url: e.target.value }))}
-                        placeholder="https://..."
-                    />
+                    <input className="input" value={api.url || ""} onChange={(e) => setApi((p) => ({ ...p, url: e.target.value }))} placeholder="https://..." />
                 </div>
 
                 <div className="field" style={{ gridColumn: "1 / span 2" }}>
                     <label>Extract Path (empty = root array)</label>
-                    <input
-                        className="input"
-                        value={api.extract || ""}
-                        onChange={(e) => setApi((p) => ({ ...p, extract: e.target.value }))}
-                        placeholder="e.g. data.items"
-                    />
+                    <input className="input" value={api.extract || ""} onChange={(e) => setApi((p) => ({ ...p, extract: e.target.value }))} placeholder="e.g. data.items" />
                 </div>
             </div>
 
@@ -302,7 +368,6 @@ function ApiForm({ title, api, setApi, resetKey }) {
                 />
             </div>
 
-            {/* ✅ NEW: response field map */}
             <div style={{ marginTop: 12 }}>
                 <KvEditor
                     label="Response Field Map (this API field → canonical field)"
@@ -338,7 +403,7 @@ export default function ApiDiff() {
         query: {},
         queryKeyMap: {},
         extract: "",
-        fieldMap: {}, // ✅ NEW
+        fieldMap: {},
     });
 
     const [others, setOthers] = useState([
@@ -350,7 +415,7 @@ export default function ApiDiff() {
             query: {},
             queryKeyMap: {},
             extract: "",
-            fieldMap: {}, // ✅ NEW
+            fieldMap: {},
         },
     ]);
 
@@ -399,25 +464,20 @@ export default function ApiDiff() {
             query: a.query ?? {},
             queryKeyMap: a.queryKeyMap ?? {},
             extract: a.extract ?? "",
-            fieldMap: a.fieldMap ?? {}, // ✅ NEW
+            fieldMap: a.fieldMap ?? {},
         };
     }
 
     function applyPreset(data) {
         setReqName(data.reqName ?? "");
         setIdKey(data.idKey ?? "OCode");
-
-        // accept either "csv string" or "array"
         setIgnoreFields(toCsvString(data.ignoreFields ?? ""));
         setCompareFields(toCsvString(data.compareFields ?? ""));
-
         setCompareMode(data.compareMode ?? "union");
         setMaxDiffs(data.maxDiffs ?? 5000);
         setTimeoutSec(data.timeoutSec ?? 20);
-
         setSharedHeaders(data.sharedHeaders ?? [{ k: "", v: "" }]);
         setSharedQuery(data.sharedQuery ?? [{ k: "", v: "" }]);
-
         setPrimary(normalizeApiShape(data.primary) || normalizeApiShape(null));
         setOthers((data.others ?? []).map(normalizeApiShape));
     }
@@ -440,8 +500,8 @@ export default function ApiDiff() {
         return {
             reqName,
             idKey,
-            ignoreFields, // keep as csv string (backwards compatible)
-            compareFields, // keep as csv string (backwards compatible)
+            ignoreFields,
+            compareFields,
             compareMode,
             maxDiffs: Number(maxDiffs) || 0,
             timeoutSec: Number(timeoutSec) || 20,
@@ -539,42 +599,24 @@ export default function ApiDiff() {
                     <div className="presetsRow">
                         <div className="field presetsRow__left">
                             <label>Preset</label>
-                            <select
-                                className="select"
+
+                            {/* ✅ CUSTOM DROPDOWN */}
+                            <PresetDropdown
                                 value={selectedPresetId}
-                                onChange={(e) => onSelectPreset(e.target.value)}
+                                options={allPresets}
+                                onChange={(id) => onSelectPreset(id)}
                                 disabled={allPresets.length === 0}
-                            >
-                                {allPresets.length === 0 ? (
-                                    <option value="">No presets loaded</option>
-                                ) : (
-                                    allPresets.map((p) => (
-                                        <option key={p.id} value={p.id}>
-                                            {p.name}
-                                            {p.id.startsWith("user:") ? " (saved)" : ""}
-                                        </option>
-                                    ))
-                                )}
-                            </select>
+                            />
 
                             <div />
 
                             <label>Save current as preset</label>
                             <div className="row row--nowrap row--tight">
-                                <input
-                                    className="input"
-                                    value={newPresetName}
-                                    onChange={(e) => setNewPresetName(e.target.value)}
-                                    placeholder="Preset name"
-                                />
+                                <input className="input" value={newPresetName} onChange={(e) => setNewPresetName(e.target.value)} placeholder="Preset name" />
                                 <button className="btn btn--primary" onClick={saveCurrentPreset}>
                                     Save
                                 </button>
-                                <button
-                                    className="btn btn--danger"
-                                    onClick={deleteSelectedPreset}
-                                    disabled={!selectedPresetId.startsWith("user:")}
-                                >
+                                <button className="btn btn--danger" onClick={deleteSelectedPreset} disabled={!selectedPresetId.startsWith("user:")}>
                                     Delete
                                 </button>
                             </div>
@@ -624,7 +666,6 @@ export default function ApiDiff() {
                                             )}
                                         </div>
 
-                                        {/* ✅ NEW: show per-side fetch errors without failing whole page */}
                                         {(rep.primaryFetchError || rep.otherFetchError) && (
                                             <div style={{ marginTop: 10 }} className="alert">
                                                 <div style={{ fontWeight: 800, marginBottom: 6 }}>Fetch error</div>
@@ -657,7 +698,6 @@ export default function ApiDiff() {
                                             </div>
                                         )}
 
-                                        {/* raw responses */}
                                         <div style={{ marginTop: 12 }} className="stack">
                                             <details>
                                                 <summary style={{ cursor: "pointer", fontWeight: 800 }}>Primary response (raw)</summary>
@@ -812,7 +852,7 @@ export default function ApiDiff() {
                                             query: {},
                                             queryKeyMap: {},
                                             extract: "",
-                                            fieldMap: {}, // ✅ NEW
+                                            fieldMap: {},
                                         },
                                     ])
                                 }
