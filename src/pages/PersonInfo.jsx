@@ -254,8 +254,8 @@ function PersonInfo() {
                                         <th>Person ID & OCode</th>
                                         <th>Session</th>
                                         <th>Upline</th>
-                                        <th>Currency</th>
                                         <th>PersonLines</th>
+                                        <th>Currency</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -295,11 +295,15 @@ function PersonInfo() {
                                                     </div>
                                                 </td>
 
-                                                <CopyCell>{item.CurrencyCode}</CopyCell>
-
                                                 <td className="monoSmall">
                                                     {Array.isArray(item.PersonLines) ? item.PersonLines.join("\n") : ""}
                                                 </td>
+
+                                                <td className="monoSmall">
+                                                    {item.CurrencyCode}
+                                                </td>
+
+                                                {/*<CopyCell>{item.CurrencyCode}</CopyCell>*/}
                                             </tr>
                                         );
                                     })}

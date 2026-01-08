@@ -49,12 +49,12 @@
     }
   },
   {
-    "id": "builtin:listAgents",
-    "name": "ListAgents v01 (limit50-keyword=D)",
+    "id": "builtin:listAgents00",
+    "name": "ListAgents #0: limit=70, keyword=null",
     "data": {
       "reqName": "agents-compare",
-      "idKey": "OCode",
-      "ignoreFields": "EndPointUrl,IP,Domain",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
       "compareFields": "",
       "compareMode": "union",
       "maxDiffs": 5000,
@@ -66,10 +66,22 @@
         }
       ],
       "sharedQuery": [
-        { "k": "keyword", "v": "D" },
-        { "k": "limit", "v": "50" },
-        { "k": "pageIndex", "v": "0" },
-        { "k": "u", "v": "M001" }
+        {
+          "k": "keyword",
+          "v": ""
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
       ],
       "primary": {
         "name": "local",
@@ -95,7 +107,76 @@
           "url": "http://api.joker88.club/support/agents",
           "headers": {},
           "query": {
-            "t": "xm6ydk9u9b63o", "targetUserOCode": "g3aqqxcmnpayn"
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:listAgents01",
+    "name": "ListAgents #1: limit=70, keyword=TXAMM (existed in AgentPrefix M003)",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "keyword",
+          "v": "TXAMM"
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agents",
+          "headers": {},
+          "query": {
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
           },
           "queryKeyMap": {},
           "extract": ""
@@ -105,11 +186,11 @@
   },
   {
     "id": "builtin:listAgents02",
-    "name": "ListAgents v02 (limit20-no keyword)",
+    "name": "ListAgents #2: limit=70, keyword=NOTEXISTS (no exists)",
     "data": {
       "reqName": "agents-compare",
-      "idKey": "OCode",
-      "ignoreFields": "EndPointUrl,IP,Domain",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
       "compareFields": "",
       "compareMode": "union",
       "maxDiffs": 5000,
@@ -121,10 +202,22 @@
         }
       ],
       "sharedQuery": [
-        { "k": "keyword", "v": "" },
-        { "k": "limit", "v": "20" },
-        { "k": "pageIndex", "v": "0" },
-        { "k": "u", "v": "M001" }
+        {
+          "k": "keyword",
+          "v": "NOTEXISTS"
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
       ],
       "primary": {
         "name": "local",
@@ -150,7 +243,280 @@
           "url": "http://api.joker88.club/support/agents",
           "headers": {},
           "query": {
-            "t": "xm6ydk9u9b63o", "targetUserOCode": "g3aqqxcmnpayn"
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:listAgents03",
+    "name": "ListAgents #3: limit=70, keyword=TG3BM (child of TXAMM - in M003 AgentPrefix )",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "keyword",
+          "v": "TG3BM"
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agents",
+          "headers": {},
+          "query": {
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:listAgents04",
+    "name": "ListAgents #4: limit=70, keyword=0003M (Master user - not in AgentPrefix)",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "keyword",
+          "v": "0003M"
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agents",
+          "headers": {},
+          "query": {
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:listAgents05",
+    "name": "ListAgents #5: limit=70, keyword=D (group existed in AgentPrefix M003)",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "keyword",
+          "v": "D"
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agents",
+          "headers": {},
+          "query": {
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:listAgents06",
+    "name": "ListAgents #6: limit=70, keyword=GroupTest (group existed, but not in AgentPrefix M003)",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "keyword",
+          "v": "GroupTest"
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "http://api.joker88.club/support/agents",
+          "headers": {},
+          "query": {
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
           },
           "queryKeyMap": {},
           "extract": ""

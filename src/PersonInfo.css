@@ -29,22 +29,22 @@
 .personPage .table.personTable td:nth-child(2) { width: 130px; }
 
 .personPage .table.personTable th:nth-child(3),
-.personPage .table.personTable td:nth-child(3) { width: 160px; }
+.personPage .table.personTable td:nth-child(3) { width: 150px; }
 
 .personPage .table.personTable th:nth-child(4),
-.personPage .table.personTable td:nth-child(4) { width: 190px; }
+.personPage .table.personTable td:nth-child(4) { width: 180px; }
 
 .personPage .table.personTable th:nth-child(5),
-.personPage .table.personTable td:nth-child(5) { width: 190px; }
+.personPage .table.personTable td:nth-child(5) { width: 180px; }
 
 .personPage .table.personTable th:nth-child(6),
-.personPage .table.personTable td:nth-child(6) { width: 190px; }
+.personPage .table.personTable td:nth-child(6) { width: 180px; }
 
 .personPage .table.personTable th:nth-child(7),
-.personPage .table.personTable td:nth-child(7) { width: 90px; }
+.personPage .table.personTable td:nth-child(7) { width: 120px; }
 
 .personPage .table.personTable th:nth-child(8),
-.personPage .table.personTable td:nth-child(8) { width: 130px; }
+.personPage .table.personTable td:nth-child(8) { width: 150px; }
 
 /* Make CopyCell look like a contained “pill” and only highlight itself */
 .personPage .personTable .copyCell {
@@ -109,6 +109,9 @@
 .personPage .personTable .pillDanger .copyCell__inner {
     border-color: rgba(239, 68, 68, 0.55);
     background: rgba(239, 68, 68, 0.10);
+    color: rgb(153, 27, 27);
+    font-weight: 600;
+    text-align: center;
 }
 
 .personPage .personTable .pillDanger:hover .copyCell__inner,
