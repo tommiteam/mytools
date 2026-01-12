@@ -5,7 +5,13 @@ import { API_DIF_URL } from "../utils/config";
 
 const METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"];
 const API_BASE = API_DIF_URL;
+
+// user presets storage
 const LS_KEY = "apidiff.presets.v1";
+
+// ✅ NEW: base URL storage (primary/other)
+const LS_PRIMARY_BASE = "apidiff.base.primary.v1";
+const LS_OTHER_BASE = "apidiff.base.other.v1";
 
 /** ---------------------------
  * Helpers
@@ -88,6 +94,25 @@ function csvToArray(csv) {
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
+}
+
+// ✅ NEW: resolve relative preset URLs against a runtime base URL
+function isAbsoluteUrl(u) {
+    return /^https?:\/\//i.test(String(u || ""));
+}
+
+function joinUrl(base, path) {
+    const b = String(base || "").trim().replace(/\/+$/, "");
+    const p = String(path || "").trim();
+    if (!b) return p;
+    if (!p) return b;
+    const p2 = p.startsWith("/") ? p : `/${p}`;
+    return `${b}${p2}`;
+}
+
+function resolveUrl(inputUrl, baseUrl) {
+    if (!inputUrl) return "";
+    return isAbsoluteUrl(inputUrl) ? inputUrl : joinUrl(baseUrl, inputUrl);
 }
 
 /** ---------------------------
@@ -187,7 +212,7 @@ function JsonCell({ value }) {
     );
 }
 
-/** ✅ Option 2: Fully themed dropdown (no native <select>) */
+/** Fully themed dropdown (no native <select>) */
 function PresetDropdown({ value, options, onChange, disabled }) {
     const [open, setOpen] = useState(false);
     const rootRef = useRef(null);
@@ -215,10 +240,7 @@ function PresetDropdown({ value, options, onChange, disabled }) {
     }, [open]);
 
     return (
-        <div
-            ref={rootRef}
-            className={`dd ${open ? "dd--open" : ""} ${disabled ? "dd--disabled" : ""}`}
-        >
+        <div ref={rootRef} className={`dd ${open ? "dd--open" : ""} ${disabled ? "dd--disabled" : ""}`}>
             <button
                 type="button"
                 className="dd__btn"
@@ -228,17 +250,14 @@ function PresetDropdown({ value, options, onChange, disabled }) {
                 aria-expanded={open}
             >
                 <span className="dd__label">{selected ? selected.name : "Select preset"}</span>
-                <span className="dd__chev" aria-hidden="true">▾</span>
+                <span className="dd__chev" aria-hidden="true">
+          ▾
+        </span>
             </button>
 
             {open && !disabled && (
                 <>
-                    {/* Backdrop: reduces visual noise + makes the menu readable */}
-                    <div
-                        className="dd__backdrop"
-                        aria-hidden="true"
-                        onClick={() => setOpen(false)}
-                    />
+                    <div className="dd__backdrop" aria-hidden="true" onClick={() => setOpen(false)} />
 
                     <div className="dd__menu" role="listbox">
                         {options.map((p) => (
@@ -272,7 +291,7 @@ function isReportOk(rep) {
     return (s.fieldDiffs ?? 0) === 0 && (s.missingInOther ?? 0) === 0 && (s.missingInPrimary ?? 0) === 0;
 }
 
-function ApiForm({ title, api, setApi, resetKey }) {
+function ApiForm({ title, api, setApi, resetKey, baseUrl, showEffectiveUrl = true }) {
     const [headers, setHeaders] = useState(() => objToKv(api.headers));
     const [queryOverrides, setQueryOverrides] = useState(() => objToKv(api.query));
     const [queryKeyMap, setQueryKeyMap] = useState(() => objToKv(api.queryKeyMap));
@@ -344,8 +363,18 @@ function ApiForm({ title, api, setApi, resetKey }) {
                 </div>
 
                 <div className="field" style={{ gridColumn: "1 / span 2" }}>
-                    <label>URL</label>
-                    <input className="input" value={api.url || ""} onChange={(e) => setApi((p) => ({ ...p, url: e.target.value }))} placeholder="https://..." />
+                    <label>URL (absolute or path like /agents)</label>
+                    <input
+                        className="input"
+                        value={api.url || ""}
+                        onChange={(e) => setApi((p) => ({ ...p, url: e.target.value }))}
+                        placeholder="/agents or https://..."
+                    />
+                    {showEffectiveUrl ? (
+                        <div className="apidiff__subtitle" style={{ marginTop: 6 }}>
+                            Effective: <span className="code">{resolveUrl(api.url, baseUrl)}</span>
+                        </div>
+                    ) : null}
                 </div>
 
                 <div className="field" style={{ gridColumn: "1 / span 2" }}>
@@ -371,7 +400,7 @@ function ApiForm({ title, api, setApi, resetKey }) {
             <div style={{ marginTop: 12 }}>
                 <KvEditor
                     label="Response Field Map (this API field → canonical field)"
-                    hint={`Example: map StartTime → StartDate, EndTime → EndDate (so compare won't show missing fields). Supports dot paths like "A.B" → "X.Y".`}
+                    hint={`Example: map StartTime → StartDate, EndTime → EndDate. Supports dot paths like "A.B" → "X.Y".`}
                     kvs={fieldMap}
                     setKvs={setFieldMap}
                 />
@@ -394,6 +423,23 @@ export default function ApiDiff() {
 
     const [sharedHeaders, setSharedHeaders] = useState([{ k: "accept", v: "application/json" }]);
     const [sharedQuery, setSharedQuery] = useState([{ k: "", v: "" }]);
+
+    // ✅ NEW: runtime base URLs (you change once; presets keep only paths)
+    const [primaryBaseUrl, setPrimaryBaseUrl] = useState(() => {
+        return localStorage.getItem(LS_PRIMARY_BASE) || "https://6028f8364028.ngrok-free.app";
+    });
+
+    const [otherBaseUrl, setOtherBaseUrl] = useState(() => {
+        return localStorage.getItem(LS_OTHER_BASE) || "http://api.joker88.club";
+    });
+
+    useEffect(() => {
+        localStorage.setItem(LS_PRIMARY_BASE, primaryBaseUrl);
+    }, [primaryBaseUrl]);
+
+    useEffect(() => {
+        localStorage.setItem(LS_OTHER_BASE, otherBaseUrl);
+    }, [otherBaseUrl]);
 
     const [primary, setPrimary] = useState({
         name: "primary",
@@ -551,6 +597,10 @@ export default function ApiDiff() {
         setLoading(true);
 
         try {
+            // ✅ resolve URLs at send-time (supports presets storing only paths)
+            const resolvedPrimary = { ...primary, url: resolveUrl(primary.url, primaryBaseUrl) };
+            const resolvedOthers = others.map((o) => ({ ...o, url: resolveUrl(o.url, otherBaseUrl) }));
+
             const payload = {
                 name: reqName,
                 idKey,
@@ -561,8 +611,8 @@ export default function ApiDiff() {
                 timeoutSec: Number(timeoutSec) || 20,
                 sharedHeaders: kvToObj(sharedHeaders),
                 sharedQuery: kvToObj(sharedQuery),
-                primary,
-                others,
+                primary: resolvedPrimary,
+                others: resolvedOthers,
             };
 
             const res = await fetch(`${API_BASE}/compare`, {
@@ -594,19 +644,39 @@ export default function ApiDiff() {
           </span>
                 </div>
 
+                {/* ✅ NEW: Base URL inputs (primary + other) */}
+                <div className="card" style={{ marginBottom: 14 }}>
+                    <SectionHeader title="API Bases" right={<span className="badge">applies to relative preset URLs</span>} />
+                    <div className="grid-2">
+                        <div className="field">
+                            <label>Go (New) URL</label>
+                            <input
+                                className="input"
+                                value={primaryBaseUrl}
+                                onChange={(e) => setPrimaryBaseUrl(e.target.value)}
+                                placeholder="http://localhost:8080"
+                            />
+                        </div>
+
+                        <div className="field">
+                            <label>.NET (Joker) URL</label>
+                            <input
+                                className="input"
+                                value={otherBaseUrl}
+                                onChange={(e) => setOtherBaseUrl(e.target.value)}
+                                placeholder="http://api.joker88.club"
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 <div className="card" style={{ marginBottom: 14 }}>
                     <SectionHeader title="Presets" right={<span className="badge">public + browser</span>} />
                     <div className="presetsRow">
                         <div className="field presetsRow__left">
                             <label>Preset</label>
 
-                            {/* ✅ CUSTOM DROPDOWN */}
-                            <PresetDropdown
-                                value={selectedPresetId}
-                                options={allPresets}
-                                onChange={(id) => onSelectPreset(id)}
-                                disabled={allPresets.length === 0}
-                            />
+                            <PresetDropdown value={selectedPresetId} options={allPresets} onChange={(id) => onSelectPreset(id)} disabled={allPresets.length === 0} />
 
                             <div />
 
@@ -651,8 +721,7 @@ export default function ApiDiff() {
                                     <div key={idx} className={`card ${ok ? "card--ok" : "card--bad"}`}>
                                         <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
                                             <div style={{ fontWeight: 800 }}>
-                                                {rep.caseName || "(case)"} — <span className="code">{rep.primary}</span> vs{" "}
-                                                <span className="code">{rep.other}</span>
+                                                {rep.caseName || "(case)"} — <span className="code">{rep.primary}</span> vs <span className="code">{rep.other}</span>
                                             </div>
 
                                             {skipped ? (
@@ -832,7 +901,13 @@ export default function ApiDiff() {
                 </div>
 
                 <div style={{ marginTop: 14 }}>
-                    <ApiForm title="A) Primary API" api={primary} setApi={setPrimary} resetKey={selectedPresetId} />
+                    <ApiForm
+                        title="A) Primary API"
+                        api={primary}
+                        setApi={setPrimary}
+                        resetKey={selectedPresetId}
+                        baseUrl={primaryBaseUrl}
+                    />
                 </div>
 
                 <div style={{ marginTop: 14 }} className="card">
@@ -865,13 +940,9 @@ export default function ApiDiff() {
                     <div className="stack" style={{ marginTop: 12 }}>
                         {others.map((api, idx) => (
                             <div key={idx} className="stack">
-                                <ApiForm title={`Other #${idx + 1}`} api={api} setApi={setOtherAt(idx)} resetKey={selectedPresetId} />
+                                <ApiForm title={`Other #${idx + 1}`} api={api} setApi={setOtherAt(idx)} resetKey={selectedPresetId} baseUrl={otherBaseUrl} />
                                 <div className="row" style={{ justifyContent: "flex-end" }}>
-                                    <button
-                                        className="btn btn--danger"
-                                        onClick={() => setOthers((prev) => prev.filter((_, i) => i !== idx))}
-                                        disabled={others.length === 1}
-                                    >
+                                    <button className="btn btn--danger" onClick={() => setOthers((prev) => prev.filter((_, i) => i !== idx))} disabled={others.length === 1}>
                                         Remove this other
                                     </button>
                                 </div>

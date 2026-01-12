@@ -25,7 +25,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/access-users",
+        "url": "/access-users",
         "headers": {
           "T": "xm6p98oo7p63o"
         },
@@ -37,7 +37,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/user/access-users",
+          "url": "/user/access-users",
           "headers": {},
           "query": {
             "t": "xm6p98oo7p63o"
@@ -86,7 +86,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "url": "/agents",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -104,7 +104,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agents",
+          "url": "/support/agents",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o",
@@ -154,7 +154,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "url": "/agents",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -172,7 +172,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agents",
+          "url": "/support/agents",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o",
@@ -222,7 +222,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "url": "/agents",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -240,7 +240,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agents",
+          "url": "/support/agents",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o",
@@ -290,7 +290,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "url": "/agents",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -308,7 +308,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agents",
+          "url": "/support/agents",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o",
@@ -358,7 +358,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "url": "/agents",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -376,7 +376,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agents",
+          "url": "/support/agents",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o",
@@ -426,7 +426,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "url": "/agents",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -444,7 +444,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agents",
+          "url": "/support/agents",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o",
@@ -494,7 +494,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/agents",
+        "url": "/agents",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -512,7 +512,75 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agents",
+          "url": "/support/agents",
+          "headers": {},
+          "query": {
+            "t": "xm6ydk9u9b63o",
+            "targetUserOCode": "g3aqqxcmnpayn"
+          },
+          "queryKeyMap": {},
+          "extract": ""
+        }
+      ]
+    }
+  },
+  {
+    "id": "builtin:listAgents07",
+    "name": "ListAgents #7: limit=70, keyword=null, uplineUsername=TXAMM (existed in AgentPrefix M003)",
+    "data": {
+      "reqName": "agents-compare",
+      "idKey": "Username",
+      "ignoreFields": "EndPointUrl,IP,Domain,CurrencyCodes,HasExternalApp,Nickname,PersonStatus,StatusReason,Publisher",
+      "compareFields": "",
+      "compareMode": "union",
+      "maxDiffs": 5000,
+      "timeoutSec": 20,
+      "sharedHeaders": [
+        {
+          "k": "accept",
+          "v": "application/json"
+        }
+      ],
+      "sharedQuery": [
+        {
+          "k": "keyword",
+          "v": ""
+        },
+        {
+          "k": "limit",
+          "v": "70"
+        },
+        {
+          "k": "pageIndex",
+          "v": "0"
+        },
+        {
+          "k": "u",
+          "v": "M001"
+        }
+      ],
+      "primary": {
+        "name": "local",
+        "method": "GET",
+        "url": "/agents",
+        "headers": {
+          "T": "xm6ydk9u9b63o"
+        },
+        "query": {
+          "targetUserUsername": "M003", "UplineUsername": "TXAMM"
+        },
+        "queryKeyMap": {
+          "keyword": "Keyword",
+          "limit": "Limit",
+          "pageIndex": "PageIndex"
+        },
+        "extract": "Agents"
+      },
+      "others": [
+        {
+          "name": "joker-api",
+          "method": "GET",
+          "url": "/support/agents",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o",
@@ -554,7 +622,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/currency-codes",
+        "url": "/currency-codes",
         "headers": {
           "T": "xm6ydk9u9b63o"
         },
@@ -568,7 +636,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/currency-codes",
+          "url": "/support/currency-codes",
           "headers": {},
           "query": {
             "t": "xm6ydk9u9b63o"
@@ -609,7 +677,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/events",
+        "url": "/events",
         "headers": {
           "T": "xm6p98oo7p63o"
         },
@@ -628,7 +696,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agent/xjro7btqw45nk/events",
+          "url": "/support/agent/xjro7btqw45nk/events",
           "headers": {},
           "query": {
             "t": "xm6p98oo7p63o",
@@ -679,7 +747,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/report/game/summary",
+        "url": "/report/game/summary",
         "headers": {
           "T": "xm6p98oo7p63o"
         },
@@ -701,7 +769,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agent/xm6ds3k3rg94k/game-summary-period",
+          "url": "/support/agent/xm6ds3k3rg94k/game-summary-period",
           "headers": {},
           "query": {
             "t": "xm6p98oo7p63o",
@@ -758,7 +826,7 @@
       "primary": {
         "name": "local",
         "method": "GET",
-        "url": "https://6028f8364028.ngrok-free.app/report/person-winloss/summary",
+        "url": "/report/person-winloss/summary",
         "headers": {
           "T": "xm6p98oo7p63o"
         },
@@ -781,7 +849,7 @@
         {
           "name": "joker-api",
           "method": "GET",
-          "url": "http://api.joker88.club/support/agent/xm6dz6x97mrxs/winloss-period",
+          "url": "/support/agent/xm6dz6x97mrxs/winloss-period",
           "headers": {},
           "query": {
             "t": "xm6p98oo7p63o",
