@@ -13,9 +13,13 @@ const LS_KEY = "apidiff.presets.v1";
 const LS_PRIMARY_BASE = "apidiff.base.primary.v1";
 const LS_OTHER_BASE = "apidiff.base.other.v1";
 
-// ✅ optional: force override origin even if preset URL is absolute
+// optional: force override origin even if preset URL is absolute
 const LS_PRIMARY_FORCE = "apidiff.base.primary.force.v1";
 const LS_OTHER_FORCE = "apidiff.base.other.force.v1";
+
+// ✅ NEW: runtime token storage (primary/other)
+const LS_PRIMARY_TOKEN = "apidiff.token.primary.v1"; // will be applied to headers.T
+const LS_OTHER_TOKEN = "apidiff.token.other.v1";     // will be applied to query.t
 
 /** ---------------------------
  * Helpers
@@ -152,6 +156,33 @@ function resolveUrl(inputUrl, baseUrl, forceOverrideOrigin = false) {
         return forceOverrideOrigin && base ? swapOrigin(url, base) : url;
     }
     return joinUrl(base, url);
+}
+
+/** ✅ NEW: token overrides (runtime) */
+function applyPrimaryToken(api, token) {
+    const t = String(token || "").trim();
+    if (!t) return api;
+
+    const headers = { ...(api.headers || {}) };
+    // override existing T/t if present; else default to "T"
+    const existing = Object.keys(headers).find((k) => k.toLowerCase() === "t");
+    if (existing) headers[existing] = t;
+    else headers["T"] = t;
+
+    return { ...api, headers };
+}
+
+function applyOtherToken(api, token) {
+    const t = String(token || "").trim();
+    if (!t) return api;
+
+    const query = { ...(api.query || {}) };
+    // override existing t/T if present; else default to "t"
+    const existing = Object.keys(query).find((k) => k.toLowerCase() === "t");
+    if (existing) query[existing] = t;
+    else query["t"] = t;
+
+    return { ...api, query };
 }
 
 /** ---------------------------
@@ -330,15 +361,7 @@ function isReportOk(rep) {
     return (s.fieldDiffs ?? 0) === 0 && (s.missingInOther ?? 0) === 0 && (s.missingInPrimary ?? 0) === 0;
 }
 
-function ApiForm({
-                     title,
-                     api,
-                     setApi,
-                     resetKey,
-                     baseUrl,
-                     forceOverrideOrigin,
-                     showEffectiveUrl = true,
-                 }) {
+function ApiForm({ title, api, setApi, resetKey, baseUrl, forceOverrideOrigin, showEffectiveUrl = true }) {
     const [headers, setHeaders] = useState(() => objToKv(api.headers));
     const [queryOverrides, setQueryOverrides] = useState(() => objToKv(api.query));
     const [queryKeyMap, setQueryKeyMap] = useState(() => objToKv(api.queryKeyMap));
@@ -484,7 +507,7 @@ export default function ApiDiff() {
         return localStorage.getItem(LS_OTHER_BASE) || "http://api.joker88.club";
     });
 
-    // ✅ force override origin toggles
+    // force override origin toggles
     const [forcePrimaryOrigin, setForcePrimaryOrigin] = useState(() => {
         return localStorage.getItem(LS_PRIMARY_FORCE) === "1";
     });
@@ -492,10 +515,19 @@ export default function ApiDiff() {
         return localStorage.getItem(LS_OTHER_FORCE) === "1";
     });
 
+    // ✅ NEW: runtime tokens
+    const [primaryToken, setPrimaryToken] = useState(() => localStorage.getItem(LS_PRIMARY_TOKEN) || "");
+    const [otherToken, setOtherToken] = useState(() => localStorage.getItem(LS_OTHER_TOKEN) || "");
+    const [showTokens, setShowTokens] = useState(false);
+
     useEffect(() => localStorage.setItem(LS_PRIMARY_BASE, primaryBaseUrl), [primaryBaseUrl]);
     useEffect(() => localStorage.setItem(LS_OTHER_BASE, otherBaseUrl), [otherBaseUrl]);
     useEffect(() => localStorage.setItem(LS_PRIMARY_FORCE, forcePrimaryOrigin ? "1" : "0"), [forcePrimaryOrigin]);
     useEffect(() => localStorage.setItem(LS_OTHER_FORCE, forceOtherOrigin ? "1" : "0"), [forceOtherOrigin]);
+
+    // ✅ NEW: persist tokens
+    useEffect(() => localStorage.setItem(LS_PRIMARY_TOKEN, primaryToken), [primaryToken]);
+    useEffect(() => localStorage.setItem(LS_OTHER_TOKEN, otherToken), [otherToken]);
 
     const [primary, setPrimary] = useState({
         name: "primary",
@@ -654,8 +686,12 @@ export default function ApiDiff() {
 
         try {
             // resolve URLs at send-time (supports presets storing only paths)
-            const resolvedPrimary = { ...primary, url: resolveUrl(primary.url, primaryBaseUrl, forcePrimaryOrigin) };
-            const resolvedOthers = others.map((o) => ({ ...o, url: resolveUrl(o.url, otherBaseUrl, forceOtherOrigin) }));
+            let resolvedPrimary = { ...primary, url: resolveUrl(primary.url, primaryBaseUrl, forcePrimaryOrigin) };
+            let resolvedOthers = others.map((o) => ({ ...o, url: resolveUrl(o.url, otherBaseUrl, forceOtherOrigin) }));
+
+            // ✅ NEW: apply runtime tokens at send-time
+            resolvedPrimary = applyPrimaryToken(resolvedPrimary, primaryToken);
+            resolvedOthers = resolvedOthers.map((o) => applyOtherToken(o, otherToken));
 
             const payload = {
                 name: reqName,
@@ -739,6 +775,54 @@ export default function ApiDiff() {
                                 Override origin even if preset URL is absolute
                             </label>
                         </div>
+                    </div>
+                </div>
+
+                {/* ✅ NEW: Token inputs */}
+                <div className="card" style={{ marginBottom: 14 }}>
+                    <SectionHeader
+                        title="Tokens"
+                        right={
+                            <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                                <input type="checkbox" checked={showTokens} onChange={(e) => setShowTokens(e.target.checked)} />
+                                Show
+                            </label>
+                        }
+                    />
+                    <div className="grid-2">
+                        <div className="field">
+                            <label>Go (New) token → header key: <span className="code">T</span></label>
+                            <input
+                                className="input"
+                                type={showTokens ? "text" : "password"}
+                                value={primaryToken}
+                                onChange={(e) => setPrimaryToken(e.target.value)}
+                                placeholder="paste token here"
+                                autoComplete="off"
+                            />
+                            <div className="apidiff__subtitle" style={{ marginTop: 6 }}>
+                                Will override <span className="code">primary.headers.T</span> at send-time.
+                            </div>
+                        </div>
+
+                        <div className="field">
+                            <label>Joker (.NET) token → query key: <span className="code">t</span></label>
+                            <input
+                                className="input"
+                                type={showTokens ? "text" : "password"}
+                                value={otherToken}
+                                onChange={(e) => setOtherToken(e.target.value)}
+                                placeholder="paste token here"
+                                autoComplete="off"
+                            />
+                            <div className="apidiff__subtitle" style={{ marginTop: 6 }}>
+                                Will override <span className="code">others[].query.t</span> at send-time.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="apidiff__subtitle" style={{ marginTop: 10 }}>
+                        Note: tokens are stored in <span className="code">localStorage</span> on this browser.
                     </div>
                 </div>
 
@@ -1049,6 +1133,7 @@ export default function ApiDiff() {
                         ))}
                     </div>
                 </div>
+
             </div>
         </div>
     );
