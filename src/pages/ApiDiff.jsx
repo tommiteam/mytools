@@ -9,9 +9,13 @@ const API_BASE = API_DIF_URL;
 // user presets storage
 const LS_KEY = "apidiff.presets.v1";
 
-// ✅ NEW: base URL storage (primary/other)
+// base URL storage (primary/other)
 const LS_PRIMARY_BASE = "apidiff.base.primary.v1";
 const LS_OTHER_BASE = "apidiff.base.other.v1";
+
+// ✅ optional: force override origin even if preset URL is absolute
+const LS_PRIMARY_FORCE = "apidiff.base.primary.force.v1";
+const LS_OTHER_FORCE = "apidiff.base.other.force.v1";
 
 /** ---------------------------
  * Helpers
@@ -96,9 +100,18 @@ function csvToArray(csv) {
         .filter(Boolean);
 }
 
-// ✅ NEW: resolve relative preset URLs against a runtime base URL
+/** URL resolving (supports: preset path "/agents" + base "http://host:port") */
 function isAbsoluteUrl(u) {
     return /^https?:\/\//i.test(String(u || ""));
+}
+
+// if user types "k8s-01:31892" without scheme, assume http://
+function normalizeBaseUrl(base, defaultScheme = "http") {
+    let b = String(base || "").trim();
+    if (!b) return "";
+    if (isAbsoluteUrl(b)) return b;
+    if (b.startsWith("//")) b = b.slice(2);
+    return `${defaultScheme}://${b}`;
 }
 
 function joinUrl(base, path) {
@@ -110,9 +123,35 @@ function joinUrl(base, path) {
     return `${b}${p2}`;
 }
 
-function resolveUrl(inputUrl, baseUrl) {
-    if (!inputUrl) return "";
-    return isAbsoluteUrl(inputUrl) ? inputUrl : joinUrl(baseUrl, inputUrl);
+function swapOrigin(fullUrl, newBase) {
+    try {
+        const u = new URL(fullUrl);
+        const b = new URL(newBase);
+        u.protocol = b.protocol;
+        u.hostname = b.hostname;
+        u.port = b.port;
+        return u.toString();
+    } catch {
+        return fullUrl;
+    }
+}
+
+/**
+ * resolveUrl:
+ * - if preset URL is "/agents" => base + path
+ * - if preset URL is absolute:
+ *    - normally keep it
+ *    - if forceOverrideOrigin=true, replace protocol/host/port with base
+ */
+function resolveUrl(inputUrl, baseUrl, forceOverrideOrigin = false) {
+    const url = String(inputUrl || "").trim();
+    if (!url) return "";
+
+    const base = normalizeBaseUrl(baseUrl, "http"); // safe for "http://..." or "k8s-01:31892"
+    if (isAbsoluteUrl(url)) {
+        return forceOverrideOrigin && base ? swapOrigin(url, base) : url;
+    }
+    return joinUrl(base, url);
 }
 
 /** ---------------------------
@@ -291,7 +330,15 @@ function isReportOk(rep) {
     return (s.fieldDiffs ?? 0) === 0 && (s.missingInOther ?? 0) === 0 && (s.missingInPrimary ?? 0) === 0;
 }
 
-function ApiForm({ title, api, setApi, resetKey, baseUrl, showEffectiveUrl = true }) {
+function ApiForm({
+                     title,
+                     api,
+                     setApi,
+                     resetKey,
+                     baseUrl,
+                     forceOverrideOrigin,
+                     showEffectiveUrl = true,
+                 }) {
     const [headers, setHeaders] = useState(() => objToKv(api.headers));
     const [queryOverrides, setQueryOverrides] = useState(() => objToKv(api.query));
     const [queryKeyMap, setQueryKeyMap] = useState(() => objToKv(api.queryKeyMap));
@@ -341,6 +388,11 @@ function ApiForm({ title, api, setApi, resetKey, baseUrl, showEffectiveUrl = tru
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldMap]);
 
+    const effectiveUrl = useMemo(
+        () => resolveUrl(api.url, baseUrl, forceOverrideOrigin),
+        [api.url, baseUrl, forceOverrideOrigin]
+    );
+
     return (
         <div className="card">
             <SectionHeader title={title} />
@@ -372,7 +424,7 @@ function ApiForm({ title, api, setApi, resetKey, baseUrl, showEffectiveUrl = tru
                     />
                     {showEffectiveUrl ? (
                         <div className="apidiff__subtitle" style={{ marginTop: 6 }}>
-                            Effective: <span className="code">{resolveUrl(api.url, baseUrl)}</span>
+                            Effective: <span className="code">{effectiveUrl}</span>
                         </div>
                     ) : null}
                 </div>
@@ -424,22 +476,26 @@ export default function ApiDiff() {
     const [sharedHeaders, setSharedHeaders] = useState([{ k: "accept", v: "application/json" }]);
     const [sharedQuery, setSharedQuery] = useState([{ k: "", v: "" }]);
 
-    // ✅ NEW: runtime base URLs (you change once; presets keep only paths)
+    // runtime base URLs
     const [primaryBaseUrl, setPrimaryBaseUrl] = useState(() => {
         return localStorage.getItem(LS_PRIMARY_BASE) || "https://6028f8364028.ngrok-free.app";
     });
-
     const [otherBaseUrl, setOtherBaseUrl] = useState(() => {
         return localStorage.getItem(LS_OTHER_BASE) || "http://api.joker88.club";
     });
 
-    useEffect(() => {
-        localStorage.setItem(LS_PRIMARY_BASE, primaryBaseUrl);
-    }, [primaryBaseUrl]);
+    // ✅ force override origin toggles
+    const [forcePrimaryOrigin, setForcePrimaryOrigin] = useState(() => {
+        return localStorage.getItem(LS_PRIMARY_FORCE) === "1";
+    });
+    const [forceOtherOrigin, setForceOtherOrigin] = useState(() => {
+        return localStorage.getItem(LS_OTHER_FORCE) === "1";
+    });
 
-    useEffect(() => {
-        localStorage.setItem(LS_OTHER_BASE, otherBaseUrl);
-    }, [otherBaseUrl]);
+    useEffect(() => localStorage.setItem(LS_PRIMARY_BASE, primaryBaseUrl), [primaryBaseUrl]);
+    useEffect(() => localStorage.setItem(LS_OTHER_BASE, otherBaseUrl), [otherBaseUrl]);
+    useEffect(() => localStorage.setItem(LS_PRIMARY_FORCE, forcePrimaryOrigin ? "1" : "0"), [forcePrimaryOrigin]);
+    useEffect(() => localStorage.setItem(LS_OTHER_FORCE, forceOtherOrigin ? "1" : "0"), [forceOtherOrigin]);
 
     const [primary, setPrimary] = useState({
         name: "primary",
@@ -597,9 +653,9 @@ export default function ApiDiff() {
         setLoading(true);
 
         try {
-            // ✅ resolve URLs at send-time (supports presets storing only paths)
-            const resolvedPrimary = { ...primary, url: resolveUrl(primary.url, primaryBaseUrl) };
-            const resolvedOthers = others.map((o) => ({ ...o, url: resolveUrl(o.url, otherBaseUrl) }));
+            // resolve URLs at send-time (supports presets storing only paths)
+            const resolvedPrimary = { ...primary, url: resolveUrl(primary.url, primaryBaseUrl, forcePrimaryOrigin) };
+            const resolvedOthers = others.map((o) => ({ ...o, url: resolveUrl(o.url, otherBaseUrl, forceOtherOrigin) }));
 
             const payload = {
                 name: reqName,
@@ -644,7 +700,7 @@ export default function ApiDiff() {
           </span>
                 </div>
 
-                {/* ✅ NEW: Base URL inputs (primary + other) */}
+                {/* Base URL inputs */}
                 <div className="card" style={{ marginBottom: 14 }}>
                     <SectionHeader title="API Bases" right={<span className="badge">applies to relative preset URLs</span>} />
                     <div className="grid-2">
@@ -656,6 +712,14 @@ export default function ApiDiff() {
                                 onChange={(e) => setPrimaryBaseUrl(e.target.value)}
                                 placeholder="http://localhost:8080"
                             />
+                            <label style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+                                <input
+                                    type="checkbox"
+                                    checked={forcePrimaryOrigin}
+                                    onChange={(e) => setForcePrimaryOrigin(e.target.checked)}
+                                />
+                                Override origin even if preset URL is absolute
+                            </label>
                         </div>
 
                         <div className="field">
@@ -666,6 +730,14 @@ export default function ApiDiff() {
                                 onChange={(e) => setOtherBaseUrl(e.target.value)}
                                 placeholder="http://api.joker88.club"
                             />
+                            <label style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 8 }}>
+                                <input
+                                    type="checkbox"
+                                    checked={forceOtherOrigin}
+                                    onChange={(e) => setForceOtherOrigin(e.target.checked)}
+                                />
+                                Override origin even if preset URL is absolute
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -676,17 +748,31 @@ export default function ApiDiff() {
                         <div className="field presetsRow__left">
                             <label>Preset</label>
 
-                            <PresetDropdown value={selectedPresetId} options={allPresets} onChange={(id) => onSelectPreset(id)} disabled={allPresets.length === 0} />
+                            <PresetDropdown
+                                value={selectedPresetId}
+                                options={allPresets}
+                                onChange={(id) => onSelectPreset(id)}
+                                disabled={allPresets.length === 0}
+                            />
 
                             <div />
 
                             <label>Save current as preset</label>
                             <div className="row row--nowrap row--tight">
-                                <input className="input" value={newPresetName} onChange={(e) => setNewPresetName(e.target.value)} placeholder="Preset name" />
+                                <input
+                                    className="input"
+                                    value={newPresetName}
+                                    onChange={(e) => setNewPresetName(e.target.value)}
+                                    placeholder="Preset name"
+                                />
                                 <button className="btn btn--primary" onClick={saveCurrentPreset}>
                                     Save
                                 </button>
-                                <button className="btn btn--danger" onClick={deleteSelectedPreset} disabled={!selectedPresetId.startsWith("user:")}>
+                                <button
+                                    className="btn btn--danger"
+                                    onClick={deleteSelectedPreset}
+                                    disabled={!selectedPresetId.startsWith("user:")}
+                                >
                                     Delete
                                 </button>
                             </div>
@@ -721,7 +807,8 @@ export default function ApiDiff() {
                                     <div key={idx} className={`card ${ok ? "card--ok" : "card--bad"}`}>
                                         <div className="row" style={{ justifyContent: "space-between", alignItems: "center" }}>
                                             <div style={{ fontWeight: 800 }}>
-                                                {rep.caseName || "(case)"} — <span className="code">{rep.primary}</span> vs <span className="code">{rep.other}</span>
+                                                {rep.caseName || "(case)"} — <span className="code">{rep.primary}</span> vs{" "}
+                                                <span className="code">{rep.other}</span>
                                             </div>
 
                                             {skipped ? (
@@ -907,6 +994,7 @@ export default function ApiDiff() {
                         setApi={setPrimary}
                         resetKey={selectedPresetId}
                         baseUrl={primaryBaseUrl}
+                        forceOverrideOrigin={forcePrimaryOrigin}
                     />
                 </div>
 
@@ -940,9 +1028,20 @@ export default function ApiDiff() {
                     <div className="stack" style={{ marginTop: 12 }}>
                         {others.map((api, idx) => (
                             <div key={idx} className="stack">
-                                <ApiForm title={`Other #${idx + 1}`} api={api} setApi={setOtherAt(idx)} resetKey={selectedPresetId} baseUrl={otherBaseUrl} />
+                                <ApiForm
+                                    title={`Other #${idx + 1}`}
+                                    api={api}
+                                    setApi={setOtherAt(idx)}
+                                    resetKey={selectedPresetId}
+                                    baseUrl={otherBaseUrl}
+                                    forceOverrideOrigin={forceOtherOrigin}
+                                />
                                 <div className="row" style={{ justifyContent: "flex-end" }}>
-                                    <button className="btn btn--danger" onClick={() => setOthers((prev) => prev.filter((_, i) => i !== idx))} disabled={others.length === 1}>
+                                    <button
+                                        className="btn btn--danger"
+                                        onClick={() => setOthers((prev) => prev.filter((_, i) => i !== idx))}
+                                        disabled={others.length === 1}
+                                    >
                                         Remove this other
                                     </button>
                                 </div>
